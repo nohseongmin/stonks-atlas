@@ -1,3 +1,5 @@
 {"fp": "7fb907c3e95ca5d3", "name": "LTW_모멘텀_L7", "spec": {"lookback": 7, "long_only": false}, "sharpe": 0.4015995671172896}
 {"fp": "21d648f195c3c952", "name": "LTW_모멘텀_L14", "spec": {"lookback": 14, "long_only": false}, "sharpe": 0.81921789841633}
 {"fp": "8d98cbfc07f4c30c", "name": "LTW_모멘텀_L7_롱온리", "spec": {"lookback": 7, "long_only": true}, "sharpe": 0.7067200425185898}
+{"fp": "c77444cbaa57fd84", "name": "조합_고정50", "spec": {"rule": "fixed", "ltw": 0.5, "bench": 0.5}, "sharpe": 1.0294881872891013}
+{"fp": "eb8a1697a4f82dae", "name": "조합_역변동성", "spec": {"rule": "inverse_vol", "window": 90}, "sharpe": 1.0572065722049728}

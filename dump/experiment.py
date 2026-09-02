@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import math
 import statistics as st
 
 from .backtest import Bars, date_axis, run_cross_section
@@ -95,6 +96,84 @@ def run(specs: list[tuple[str, dict, object]], venue: Venue = BINANCE_USDM,
     return out
 
 
+VOL_WINDOW = 90        # PREREG_COMBO.md 에 고정. 결과를 보고 바꾸지 않는다.
+
+
+def combine(ltw_rule, weights):
+    """LTW 다리와 벤치 다리를 합친다. `weights(t) -> (LTW 그로스, 벤치 그로스)`.
+
+    LTW 가 신호를 못 내면(횡단면이 얇으면) **벤치 다리만** 그 비중으로 든다.
+    비중을 키워 메우지 않는다 — 그건 사전등록에 없는 재량이다.
+    """
+    def rule(t, past, live):
+        g1, g2 = weights(t)
+        w = ltw_rule(t, past, live) or {}
+        gross = sum(abs(x) for x in w.values())
+        out = {s: x * g1 / gross for s, x in w.items()} if gross else {}
+        if BENCH in live:
+            out[BENCH] = out.get(BENCH, 0.0) + g2
+        return out
+    return rule
+
+
+def inverse_vol(a: list[float], b: list[float], window: int = VOL_WINDOW):
+    """직전 `window` 일 실현변동성의 역수 비중. **t 시점까지만 본다.**"""
+    def w(t):
+        if t < window:
+            return 0.5, 0.5
+        sa, sb = st.pstdev(a[t - window:t]), st.pstdev(b[t - window:t])
+        if sa <= 0 or sb <= 0:
+            return 0.5, 0.5
+        ia, ib = 1 / sa, 1 / sb
+        return ia / (ia + ib), ib / (ia + ib)
+    return w
+
+
+def correlation(a: list[float], b: list[float]) -> float:
+    n = min(len(a), len(b))
+    ma, mb = st.fmean(a[:n]), st.fmean(b[:n])
+    num = sum((x - ma) * (y - mb) for x, y in zip(a[:n], b[:n]))
+    da = math.sqrt(sum((x - ma) ** 2 for x in a[:n]))
+    db = math.sqrt(sum((y - mb) ** 2 for y in b[:n]))
+    return 0.0 if da == 0 or db == 0 else num / (da * db)
+
+
+def combo_main(argv: list[str] | None = None) -> int:
+    """PREREG_COMBO.md — 비중 규칙 2 개. **상관이 얼마든 둘 다 돌린다.**"""
+    cfg = GateConfig()
+    syms = all_symbols()
+    bars = load_many(syms, "1d", MIN_BARS)
+    axis = date_axis(bars)
+    dead = sorted(set(bars) - set(live_symbols()))
+    bench = bench_curve(bars, axis, 100.0)
+    brets = returns(bench)
+    print(f"적재 {len(bars)} · 축 {len(axis)} 일 · 상폐 포함 {len(dead)} 개")
+    print(f"벤치 {BENCH} Sharpe {sharpe(brets, cfg.periods_per_year):+.2f}")
+    print()
+
+    solo = run_cross_section(bars, momentum(14), BINANCE_USDM, 100.0, 7)
+    lrets = returns(solo.equity)
+    rho = correlation(lrets, brets)
+    print(f"── 진단: LTW L=14 ↔ {BENCH} 상관 **{rho:+.3f}**")
+    n = min(len(lrets), len(brets))
+    s1 = sharpe(brets[:n], cfg.periods_per_year)
+    s2 = sharpe(lrets[:n], cfg.periods_per_year)
+    if abs(rho) < 1:
+        theo = math.sqrt(max(0.0, (s1*s1 + s2*s2 - 2*rho*s1*s2) / (1 - rho*rho)))
+        print(f"   이론 조합 Sharpe {theo:.2f} (S1={s1:.2f} S2={s2:.2f})")
+    print("   **이 이론값은 표본내 적합이다. 배포 근거가 아니다.**")
+    print()
+
+    specs = [
+        ("조합_고정50", {"rule": "fixed", "ltw": 0.5, "bench": 0.5},
+         combine(momentum(14), lambda t: (0.5, 0.5))),
+        ("조합_역변동성", {"rule": "inverse_vol", "window": VOL_WINDOW},
+         combine(momentum(14), inverse_vol(lrets, brets))),
+    ]
+    run(specs, cfg=cfg)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """PREREG_LTW.md 에 선언한 **3 건 전부.** 좋은 쪽만 고르지 않는다."""
     specs = [
@@ -108,4 +187,5 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import sys
+    raise SystemExit(combo_main() if "--combo" in sys.argv else main())
