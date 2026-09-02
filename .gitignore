@@ -12,3 +12,9 @@ data/*.csv
 data/cache/
 *.log
 .DS_Store
+
+data/months/
+data/klines/
+data/funding/
+data/symbols_all.json
+data/exchange_info.json
