@@ -3,7 +3,7 @@ import math
 
 import pytest
 
-from dump.costs import (Venue, liquidation_move, max_cagr, required_edge_bps,
+from dump.costs import (Venue, annual_to_bps_per_period, liquidation_move, max_cagr, required_edge_bps,
                         required_win_rate, ruin_by_fees_days)
 
 V = Venue("test", taker_bps=5.0, maker_bps=2.0, spread_bps=1.0,
@@ -76,3 +76,17 @@ def test_liquidation_move_shrinks_with_leverage():
     assert liquidation_move(500, 0.005) == 0.0
     with pytest.raises(ValueError):
         liquidation_move(0)
+
+
+def test_annual_funding_converts_to_period():
+    """연 2.75% -> 8h 당 bp. 정산이 하루 3 번, 1 년 365 일."""
+    assert annual_to_bps_per_period(0.0275) == pytest.approx(0.0275 / 1095 * 1e4)
+    assert annual_to_bps_per_period(0.0) == 0.0
+
+
+def test_binance_venue_is_not_marked_verified():
+    """스프레드가 미검증인 동안 규격 전체가 검증됐다고 말하면 안 된다."""
+    from dump.costs import BINANCE_USDM
+    assert not BINANCE_USDM.verified
+    assert BINANCE_USDM.taker_bps == 5.0
+    assert BINANCE_USDM.min_notional_usd == pytest.approx(77.58)

@@ -78,16 +78,33 @@ class Venue:
         return self.funding_bps_per_period * (24 / FUNDING_HOURS)
 
 
-#: 잠정 규격. **검증 전이다.** 정찰 결과가 오면 교체하고 verified=True 로 올린다.
-PROVISIONAL = Venue(
-    name="binance-usdm(잠정)",
-    taker_bps=5.0,
-    maker_bps=2.0,
-    spread_bps=1.0,
-    min_notional_usd=100.0,
+#: 심볼별 최소 주문 명목(USDT). **LOT_SIZE 가 MIN_NOTIONAL 보다 클 수 있다** —
+#: BTCUSDT 는 최소수량 0.001 BTC 가 최소명목 $50 을 넘어 실질 하한이 $77.58 이다.
+#: 출처: https://fapi.binance.com/fapi/v1/exchangeInfo (2026-09-02 실측)
+MIN_NOTIONAL_USD = {"BTCUSDT": 77.58, "ETHUSDT": 21.89}
+
+#: 최근 180 일 실측 펀딩(연환산). 전체 이력 평균(BTC 11.6%)은 2021 년이 만든 값이라
+#: 현재를 대표하지 못한다. 출처: fapi/v1/fundingRate 7,646 건 직접 계산.
+FUNDING_ANNUAL_180D = {"BTCUSDT": 0.0275, "ETHUSDT": 0.0198}
+
+
+def annual_to_bps_per_period(annual: float) -> float:
+    """연환산 펀딩률 -> 정산 1 회당 bp."""
+    return annual / (DAYS_PER_YEAR * 24 / FUNDING_HOURS) * 1e4
+
+
+#: 바이낸스 USDⓈ-M 규격. **수수료는 검증됐고 스프레드는 아직이다.**
+#: bookTicker 덤프가 2024-03-30 에 끊겨 실제 스프레드는 aggTrades 로 재구성해야 한다.
+#: 그때까지 spread_bps 는 낙관적 자리표시자다 — 이 값으로 낸 결론은 결론이 아니다.
+BINANCE_USDM = Venue(
+    name="binance-usdm",
+    taker_bps=5.0,                # [검증] binance.com/en/fee/schedule VIP 0
+    maker_bps=2.0,                # [검증] 같은 출처
+    spread_bps=1.0,               # **[미검증]** 자리표시자
+    min_notional_usd=MIN_NOTIONAL_USD["BTCUSDT"],
     max_leverage=125.0,
-    funding_bps_per_period=1.0,
-    source="미검증 — 정찰 대기",
+    funding_bps_per_period=annual_to_bps_per_period(FUNDING_ANNUAL_180D["BTCUSDT"]),
+    source="fee/funding/min-notional 실측 2026-09-02 · spread 미검증",
     verified=False,
 )
 
@@ -150,7 +167,7 @@ def liquidation_move(leverage: float, maintenance_margin: float = 0.005) -> floa
     return max(0.0, 1 / leverage - maintenance_margin)
 
 
-def report(capital: float = 100.0, venue: Venue = PROVISIONAL,
+def report(capital: float = 100.0, venue: Venue = BINANCE_USDM,
            monthly_target: float = 0.05) -> None:
     """산술을 전부 펼쳐 보인다. 검증 안 된 규격이면 맨 위에 경고를 찍는다."""
     print(f"비용 산술 — 자본 ${capital:,.0f} · {venue.name}\n")
@@ -189,6 +206,13 @@ def report(capital: float = 100.0, venue: Venue = PROVISIONAL,
                       for l in (3, 10, 20))
         print(f"{tpd:>8.1f}{row}")
     print("\n(위 숫자에는 왕복비용이 이미 포함돼 있다. 순수 신호가 저만큼 있어야 한다는 뜻)")
+
+    ann = venue.funding_bps_per_day() * DAYS_PER_YEAR / 1e4
+    print(f"\n펀딩 — 롱을 들고 있으면 명목 대비 연 {ann*100:.2f}% 를 낸다")
+    print(f"{'L':>4}{'자본대비 연':>13}{'하루':>9}")
+    for lev in (1, 3, 5, 10, 20):
+        print(f"{lev:>4}{ann*lev*100:>12.1f}%{ann*lev/DAYS_PER_YEAR*100:>8.2f}%")
+    print("(숏이면 같은 크기를 받는다. 최근 180 일 실측이고 2021 년엔 이 11 배였다)")
 
 
 if __name__ == "__main__":
