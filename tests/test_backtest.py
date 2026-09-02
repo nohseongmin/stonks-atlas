@@ -174,3 +174,11 @@ def test_qvol_length_is_checked():
     with pytest.raises(ValueError, match="qvol"):
         Bars("T", [0, HOUR], [1, 1], [1, 1], [1, 1], [1, 1], [], [1.0])
     Bars("T", [0, HOUR], [1, 1], [1, 1], [1, 1], [1, 1], [], [1.0, 2.0])
+
+
+def test_pastview_never_claims_more_than_exists():
+    """빈 배열에 길이를 주장하면 안 된다 — 필터가 그걸 믿는다."""
+    assert len(PastView([], 59)) == 0
+    assert len(PastView([1, 2], 59)) == 2
+    with pytest.raises(IndexError):
+        PastView([], 59)[0]

@@ -33,7 +33,10 @@ class PastView:
     __slots__ = ("_l", "_n")
 
     def __init__(self, lst, end: int):
-        self._l, self._n = lst, end + 1
+        # **실제 길이로 자른다.** 안 자르면 빈 배열에 길이 60 을 주장하고,
+        # 그걸 믿은 필터가 "자료가 충분하다"고 판단해 통과시킨다
+        # (거래대금 없는 심볼이 유동성 필터를 통과할 뻔했다).
+        self._l, self._n = lst, min(end + 1, len(lst))
 
     def __len__(self) -> int:
         return self._n
@@ -263,7 +266,7 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
 
         if t % rebalance == 0:
             past = {s: {k: PastView(getattr(bars[s], k), idx[s][t])
-                        for k in ("ts", "open", "high", "low", "close")}
+                        for k in ("ts", "open", "high", "low", "close", "qvol")}
                     for s in live}
             want = rule(t, past, live)
             if want is not None:

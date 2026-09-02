@@ -216,3 +216,49 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def warm(symbols: list[str], interval: str = "1d", workers: int = 16) -> dict:
+    """월 목록과 봉 파일을 **병렬로 미리 받아 캐시에 채운다.**
+
+    1,018 심볼 x 40 개월 = 4 만 요청이다. 순차로 하면 한 시간, 16 갈래면 10 분.
+    덤프 파일은 불변이라 한 번만 받으면 된다.
+
+    실패는 **모으고 계속한다** — 심볼 하나가 죽어서 전체가 멈추면 안 된다.
+    다만 몇 개가 왜 실패했는지는 반드시 돌려준다.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    bad: dict[str, str] = {}
+
+    def one(sym):
+        try:
+            for m in months(sym, interval):
+                fn = f"{sym}-{interval}-{m}.zip"
+                _cached(f"klines/{urllib.parse.quote(sym, safe='')}/{interval}/{fn}",
+                        lambda u=f"{DUMP}/{PREFIX}/klines/{_q(sym)}/{interval}/{_q(fn)}":
+                        _get(u))
+        except Exception as e:                      # noqa: BLE001 — 모아서 보고한다
+            bad[sym] = f"{type(e).__name__}: {e}"
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        list(ex.map(one, symbols))
+    return {"asked": len(symbols), "failed": bad}
+
+
+def load_many(symbols: list[str], interval: str = "1d",
+              min_bars: int = 60) -> dict[str, Bars]:
+    """여러 심볼을 `Bars` 로. **`min_bars` 미만은 버린다** — 정렬이 불가능하다.
+
+    버린 심볼 수를 조용히 삼키지 않는다. 호출부가 세어 보고할 수 있게
+    반환값에 안 넣고 끝내지 말고 로그로 남길 것.
+    """
+    out = {}
+    for s in symbols:
+        try:
+            b = load(s, interval)
+        except Exception:                           # noqa: BLE001
+            continue
+        if len(b) >= min_bars:
+            out[s] = b
+    return out
