@@ -78,6 +78,19 @@ class Venue:
         return self.funding_bps_per_period * (24 / FUNDING_HOURS)
 
 
+#: 심볼별 실측 스프레드(bp). **놀랍게 작다** — BTC 는 1 틱(0.1 USDT)이 전부다.
+#: 왕복 비용의 99.9% 가 수수료이고 스프레드는 0.1% 다. "체결을 잘하면 된다"는
+#: 탈출구가 여기서 닫힌다. 스프레드를 완벽히 먹어도 메이커 왕복 4bp 를 못 이긴다.
+#: 출처: fapi/v1/ticker/bookTicker 직접 호출 2026-09-02 05:01 UTC
+SPREAD_BPS = {"BTCUSDT": 0.0129, "ETHUSDT": 0.0414, "LINKUSDT": 0.89,
+              "SOLUSDT": 1.00, "DOGEUSDT": 1.23, "ONDOUSDT": 2.93}
+
+#: 스트레스 구간 배수. 2025-10-10 청산 캐스케이드에서 BTC 무기한 스프레드가
+#: 0.02bp -> 26.43bp (1,321 배), 호가 심도 $103.64M -> $0.17M (-99.8%).
+#: **돌파·모멘텀 백테스트가 거짓말하는 지점이 여기다** — 그 순간의 체결가는
+#: 데이터에 찍힌 호가가 아니다. 출처: blog.amberdata.io 2025-10 분석
+STRESS_SPREAD_MULT = 30.0
+
 #: 심볼별 최소 주문 명목(USDT). **LOT_SIZE 가 MIN_NOTIONAL 보다 클 수 있다** —
 #: BTCUSDT 는 최소수량 0.001 BTC 가 최소명목 $50 을 넘어 실질 하한이 $77.58 이다.
 #: 출처: https://fapi.binance.com/fapi/v1/exchangeInfo (2026-09-02 실측)
@@ -100,11 +113,11 @@ BINANCE_USDM = Venue(
     name="binance-usdm",
     taker_bps=5.0,                # [검증] binance.com/en/fee/schedule VIP 0
     maker_bps=2.0,                # [검증] 같은 출처
-    spread_bps=1.0,               # **[미검증]** 자리표시자
+    spread_bps=SPREAD_BPS["BTCUSDT"],   # [검증] bookTicker 실측
     min_notional_usd=MIN_NOTIONAL_USD["BTCUSDT"],
     max_leverage=125.0,
     funding_bps_per_period=annual_to_bps_per_period(FUNDING_ANNUAL_180D["BTCUSDT"]),
-    source="fee/funding/min-notional 실측 2026-09-02 · spread 미검증",
+    source="수수료·펀딩·최소명목·스프레드 실측 2026-09-02 · 수수료는 3자 출처",
     verified=False,
 )
 

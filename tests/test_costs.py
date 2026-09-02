@@ -90,3 +90,16 @@ def test_binance_venue_is_not_marked_verified():
     assert not BINANCE_USDM.verified
     assert BINANCE_USDM.taker_bps == 5.0
     assert BINANCE_USDM.min_notional_usd == pytest.approx(77.58)
+    assert BINANCE_USDM.round_trip_bps() == pytest.approx(10.0129)
+
+
+def test_maker_only_loses_to_fees_on_btc():
+    """**"지정가만 쓰면 된다"는 탈출구가 닫혀 있는지.**
+
+    BTC 무기한 스프레드 전체가 0.0129bp 인데 메이커 왕복은 4bp 다.
+    스프레드를 양쪽 다 완벽히 먹어도 왕복마다 진다.
+    """
+    from dump.costs import BINANCE_USDM, SPREAD_BPS
+    captured = SPREAD_BPS["BTCUSDT"]
+    maker_cost = 2 * BINANCE_USDM.maker_bps
+    assert captured - maker_cost == pytest.approx(-3.9871)
