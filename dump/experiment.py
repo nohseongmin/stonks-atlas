@@ -8,7 +8,7 @@ import statistics as st
 
 from .backtest import Bars, date_axis, run_cross_section
 from .costs import BINANCE_USDM, Venue
-from .feed import all_symbols, load_many
+from .feed import all_symbols, live_symbols, load_many
 from .gate import (GateConfig, cagr, evaluate, max_drawdown, record, returns,
                    sharpe, trials)
 from .strategies import momentum
@@ -55,6 +55,13 @@ def run(specs: list[tuple[str, dict, object]], venue: Venue = BINANCE_USDM,
     print(f"적재 {len(bars)} 개 (봉 {MIN_BARS} 개 미만 {len(syms)-len(bars)} 개 제외)"
           f" · 축 {len(axis)} 일 · {min(axis)//86400000} ~ {max(axis)//86400000}\n")
 
+    # **시점정합을 주장하지 말고 확인한다.** 상폐 종목이 실제로 들어있는지 센다.
+    dead = sorted(set(bars) - set(live_symbols()))
+    pit = bool(dead)
+    print(f"시점정합: 유니버스에 상폐 종목 {len(dead)} 개 포함 "
+          f"({', '.join(dead[:4])}...)" if pit else
+          "**시점정합 아님 — 살아있는 종목만 들어있다**")
+
     bench = bench_curve(bars, axis, capital)
     bsr = sharpe(returns(bench), cfg.periods_per_year)
     print(f"벤치 {BENCH} 매수보유 — Sharpe {bsr:+.2f} · "
@@ -79,7 +86,7 @@ def run(specs: list[tuple[str, dict, object]], venue: Venue = BINANCE_USDM,
     spread = [t["sharpe"] for t in led]
     print(f"\n원장 누적 시행 {len(led)} 건\n")
     for o in out:
-        v = evaluate(o["res"], bench, o["stressed"], len(led), spread, True, cfg)
+        v = evaluate(o["res"], bench, o["stressed"], len(led), spread, pit, cfg)
         print(f"── {o['name']} — {'**통과**' if v.passed else '기각'}")
         for c in v.checks:
             print(f"   {'OK' if c.ok else '**NG**':<7}{c.name:<12}{c.detail}")
