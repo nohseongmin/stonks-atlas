@@ -18,3 +18,4 @@ data/klines/
 data/funding/
 data/symbols_all.json
 data/exchange_info.json
+data/*.pkl

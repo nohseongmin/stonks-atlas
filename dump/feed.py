@@ -52,6 +52,16 @@ def _get(url: str) -> bytes:
         return r.read()
 
 
+def _get_or_empty(url: str) -> bytes:
+    """없는 파일(404)은 **빈 바이트로 캐시한다.** 안 그러면 매 실행마다 다시 묻는다."""
+    try:
+        return _get(url)
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return b""
+        raise
+
+
 def _q(s: str) -> str:
     """URL 인코딩. **심볼에 한자가 들어간다** — `币安人生USDT` 같은 밈코인이
     실제로 상장돼 있다. 걸러내면 그것도 선택편향이라 제대로 인코딩한다.
@@ -233,11 +243,17 @@ def warm(symbols: list[str], interval: str = "1d", workers: int = 16) -> dict:
 
     def one(sym):
         try:
-            for m in months(sym, interval):
+            ms = months(sym, interval)
+            for m in ms:
                 fn = f"{sym}-{interval}-{m}.zip"
                 _cached(f"klines/{urllib.parse.quote(sym, safe='')}/{interval}/{fn}",
                         lambda u=f"{DUMP}/{PREFIX}/klines/{_q(sym)}/{interval}/{_q(fn)}":
                         _get(u))
+            for m in ms:      # 펀딩도 같이 — 안 받으면 적재가 순차 HTTP 가 된다
+                fn = f"{sym}-fundingRate-{m}.zip"
+                _cached(f"funding/{urllib.parse.quote(sym, safe='')}/{fn}",
+                        lambda u=f"{DUMP}/{PREFIX}/fundingRate/{_q(sym)}/{_q(fn)}":
+                        _get_or_empty(u))
         except Exception as e:                      # noqa: BLE001 — 모아서 보고한다
             bad[sym] = f"{type(e).__name__}: {e}"
 
@@ -247,12 +263,16 @@ def warm(symbols: list[str], interval: str = "1d", workers: int = 16) -> dict:
 
 
 def load_many(symbols: list[str], interval: str = "1d",
-              min_bars: int = 60) -> dict[str, Bars]:
+              min_bars: int = 60, cache: bool = True) -> dict[str, Bars]:
     """여러 심볼을 `Bars` 로. **`min_bars` 미만은 버린다** — 정렬이 불가능하다.
 
     버린 심볼 수를 조용히 삼키지 않는다. 호출부가 세어 보고할 수 있게
     반환값에 안 넣고 끝내지 말고 로그로 남길 것.
     """
+    import pickle
+    p = CACHE / f"bars_{interval}_{min_bars}.pkl"
+    if cache and p.exists():
+        return pickle.loads(p.read_bytes())
     out = {}
     for s in symbols:
         try:
@@ -261,4 +281,6 @@ def load_many(symbols: list[str], interval: str = "1d",
             continue
         if len(b) >= min_bars:
             out[s] = b
+    if cache:
+        p.write_bytes(pickle.dumps(out, protocol=5))
     return out
