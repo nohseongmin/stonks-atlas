@@ -195,3 +195,123 @@ def run(bars: Bars, rule, venue: Venue, capital: float = 100.0,
         equity.append(eq)
 
     return Result(equity, targets, fees, funding_cost, trades, liquidated, n)
+
+
+def date_axis(bars: dict[str, Bars]) -> list[int]:
+    """전 심볼 타임스탬프의 합집합. **상폐된 심볼의 날짜도 들어간다.**"""
+    return sorted({t for b in bars.values() for t in b.ts})
+
+
+def _index(bars: dict[str, Bars], axis: list[int]) -> dict[str, list[int | None]]:
+    """축의 각 자리에 대응하는 심볼별 인덱스. 없으면 None."""
+    out = {}
+    for sym, b in bars.items():
+        pos = {t: i for i, t in enumerate(b.ts)}
+        out[sym] = [pos.get(t) for t in axis]
+    return out
+
+
+def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
+                      capital: float = 100.0, rebalance: int = 7,
+                      maker: bool = False) -> Result:
+    """횡단면 전략. `rule(t, past, live) -> {심볼: 가중치}` 를 리밸런싱마다 부른다.
+
+    `live` 는 **그 시점에 실제로 거래되던 심볼**이다. 상폐된 것도 살아 있던
+    동안엔 들어 있고, 아직 상장 전인 것은 안 들어 있다. 이게 시점정합이다.
+
+    가중치는 부호 있는 값이고 `sum(|w|)` 가 총 레버리지다.
+    `None` 은 유지, `{}` 는 전량 청산 — **둘은 다르다.**
+
+    ## 상폐 처리
+
+    바이낸스는 상폐되는 무기한을 **마지막 마크가격으로 정산**한다. 그래서 마지막
+    종가에 청산하는 것이 맞고, 임의의 상폐손실 계수를 넣지 않는다. 폭락은
+    이미 봉에 찍혀 있다.
+
+    ## 한계
+
+    청산 판정을 **종가 기준**으로만 한다. 단일 심볼 경로는 봉 안 고가/저가를
+    보지만 여기서는 여러 종목의 최악값이 동시에 오지 않으므로 그렇게 하면
+    과도하게 보수적이다.
+    """
+    axis = date_axis(bars)
+    n = len(axis)
+    if n < 2:
+        raise ValueError(f"축이 {n} 개다. 최소 2 개 필요")
+    if rebalance < 1:
+        raise ValueError(f"리밸런싱 간격은 1 이상이어야 한다: {rebalance}")
+
+    idx = _index(bars, axis)
+    fee = (venue.maker_bps if maker else venue.taker_bps) / 1e4
+    one_way = fee + venue.spread_bps / 2e4
+
+    eq = capital
+    held: dict[str, float] = {}
+    equity, fees = [capital], 0.0
+    funding_cost = 0.0
+    trades = 0
+    liquidated = None
+    fpos = {s: 0 for s in bars}
+
+    for t in range(n - 1):
+        live = [s for s, ix in idx.items() if ix[t] is not None]
+
+        if t % rebalance == 0:
+            past = {s: {k: PastView(getattr(bars[s], k), idx[s][t])
+                        for k in ("ts", "open", "high", "low", "close")}
+                    for s in live}
+            want = rule(t, past, live)
+            if want is not None:
+                want = {s: float(w) for s, w in want.items() if w}
+                gross = sum(abs(w) for w in want.values())
+                if gross > venue.max_leverage:
+                    raise ValueError(f"t={t}: 총 레버리지 {gross:.1f} 가 최대 "
+                                     f"{venue.max_leverage} 를 넘는다")
+                unknown = set(want) - set(live)
+                if unknown:
+                    raise ValueError(f"t={t}: 거래되지 않는 심볼에 가중치 — "
+                                     f"{sorted(unknown)[:3]}")
+                turn = sum(abs(want.get(s, 0.0) - held.get(s, 0.0))
+                           for s in set(want) | set(held))
+                if turn > 0:
+                    cost = eq * turn * one_way
+                    fees += cost
+                    eq -= cost
+                    trades += 1
+                held = want
+
+        # 이번 봉에 사라지는 종목은 마지막 종가에 정산한다(마크가격 정산).
+        gone = [s for s in held if idx[s][t + 1] is None]
+        if gone:
+            turn = sum(abs(held[s]) for s in gone)
+            cost = eq * turn * one_way
+            fees += cost
+            eq -= cost
+            for s in gone:
+                del held[s]
+
+        pnl = 0.0
+        for s, w in held.items():
+            i0, i1 = idx[s][t], idx[s][t + 1]
+            c0, c1 = bars[s].close[i0], bars[s].close[i1]
+            if c0 > 0:
+                pnl += w * (c1 / c0 - 1)
+        eq *= 1 + pnl
+
+        for s, w in held.items():
+            fund = bars[s].funding
+            while fpos[s] < len(fund) and fund[fpos[s]][0] <= axis[t + 1]:
+                ftime, rate = fund[fpos[s]]
+                if ftime > axis[t]:
+                    pay = eq * w * rate
+                    funding_cost += pay
+                    eq -= pay
+                fpos[s] += 1
+
+        if eq <= 0:
+            equity.append(0.0)
+            liquidated = t + 1
+            break
+        equity.append(eq)
+
+    return Result(equity, [], fees, funding_cost, trades, liquidated, n)
