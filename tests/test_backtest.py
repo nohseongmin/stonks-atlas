@@ -167,3 +167,10 @@ def test_too_few_bars_rejected():
 def test_bars_reject_unsorted_timestamps():
     with pytest.raises(ValueError, match="오름차순"):
         Bars("T", [2 * HOUR, HOUR], [1, 1], [1, 1], [1, 1], [1, 1])
+
+
+def test_qvol_length_is_checked():
+    """길이가 어긋난 거래대금은 조용히 통과하면 안 된다."""
+    with pytest.raises(ValueError, match="qvol"):
+        Bars("T", [0, HOUR], [1, 1], [1, 1], [1, 1], [1, 1], [], [1.0])
+    Bars("T", [0, HOUR], [1, 1], [1, 1], [1, 1], [1, 1], [], [1.0, 2.0])

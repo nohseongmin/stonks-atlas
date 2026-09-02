@@ -63,9 +63,14 @@ class Bars:
     close: list[float]
     #: (정산시각ms, 요율) 오름차순. 롱이 내는 쪽이 양수.
     funding: list[tuple[int, float]] = field(default_factory=list)
+    #: 봉별 거래대금(USDT). **유동성 필터에 쓴다** — 10~30bp 로 거래 가능한
+    #: 종목만 남기려면 이게 있어야 한다. 없으면 빈 목록.
+    qvol: list[float] = field(default_factory=list)
 
     def __post_init__(self):
         n = len(self.ts)
+        if self.qvol and len(self.qvol) != n:
+            raise ValueError(f"{self.symbol}: qvol 길이가 ts 와 다르다")
         for name in ("open", "high", "low", "close"):
             if len(getattr(self, name)) != n:
                 raise ValueError(f"{self.symbol}: {name} 길이가 ts 와 다르다")
