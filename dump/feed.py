@@ -52,6 +52,13 @@ def _get(url: str) -> bytes:
         return r.read()
 
 
+def _q(s: str) -> str:
+    """URL 인코딩. **심볼에 한자가 들어간다** — `币安人生USDT` 같은 밈코인이
+    실제로 상장돼 있다. 걸러내면 그것도 선택편향이라 제대로 인코딩한다.
+    """
+    return urllib.parse.quote(s, safe="/")
+
+
 def _cached(name: str, fetch) -> bytes:
     """디스크 캐시. 덤프 파일은 불변이라 한 번 받으면 다시 안 받는다."""
     p = CACHE / name
@@ -67,9 +74,9 @@ def _list_prefixes(prefix: str) -> list[str]:
     """S3 의 `CommonPrefixes` 를 페이지 넘겨가며 전부 모은다."""
     out, token = [], None
     while True:
-        url = f"{S3}?list-type=2&delimiter=/&prefix={prefix}"
+        url = f"{S3}?list-type=2&delimiter=/&prefix={_q(prefix)}"
         if token:
-            url += f"&continuation-token={urllib.parse.quote(token, safe='')}"
+            url += f"&continuation-token={urllib.parse.quote(token, safe=chr(0))}"
         root = ElementTree.fromstring(_get(url))
         for cp in root.findall(f"{NS}CommonPrefixes/{NS}Prefix"):
             out.append(cp.text.rstrip("/").rsplit("/", 1)[-1])
@@ -101,15 +108,17 @@ def live_symbols(refresh: bool = False) -> list[str]:
 
 def months(symbol: str, interval: str = "1d") -> list[str]:
     """그 심볼이 거래된 월 목록 (`YYYY-MM`). 상폐 시점이 여기서 나온다."""
-    p = CACHE / "months" / f"{symbol}_{interval}.json"
+    # 파일명에 심볼을 그대로 못 쓴다(한자·윈도 금지문자). 안전한 이름으로 바꾼다.
+    safe = urllib.parse.quote(symbol, safe="")
+    p = CACHE / "months" / f"{safe}_{interval}.json"
     if p.exists():
         return json.loads(p.read_text(encoding="utf-8"))
     keys, token = [], None
     pre = f"{PREFIX}/klines/{symbol}/{interval}/"
     while True:
-        url = f"{S3}?list-type=2&prefix={pre}"
+        url = f"{S3}?list-type=2&prefix={_q(pre)}"
         if token:
-            url += f"&continuation-token={urllib.parse.quote(token, safe='')}"
+            url += f"&continuation-token={urllib.parse.quote(token, safe=chr(0))}"
         root = ElementTree.fromstring(_get(url))
         for k in root.findall(f"{NS}Contents/{NS}Key"):
             name = k.text.rsplit("/", 1)[-1]
@@ -160,7 +169,7 @@ def load(symbol: str, interval: str = "1d",
     ts, op, hi, lo, cl = [], [], [], [], []
     for m in sorted(use):
         fn = f"{symbol}-{interval}-{m}.zip"
-        url = f"{DUMP}/{PREFIX}/klines/{symbol}/{interval}/{fn}"
+        url = f"{DUMP}/{PREFIX}/klines/{_q(symbol)}/{interval}/{_q(fn)}"
         for r in _parse(_cached(f"klines/{symbol}/{interval}/{fn}",
                                 lambda u=url: _get(u))):
             ts.append(int(r[0]))
@@ -176,9 +185,11 @@ def funding(symbol: str, want: list[str] | None = None) -> list[tuple[int, float
     out = []
     for m in sorted(want or []):
         fn = f"{symbol}-fundingRate-{m}.zip"
-        url = f"{DUMP}/{PREFIX}/fundingRate/{symbol}/{fn}"
+        url = f"{DUMP}/{PREFIX}/fundingRate/{_q(symbol)}/{_q(fn)}"
         try:
-            rows = _parse(_cached(f"funding/{symbol}/{fn}", lambda u=url: _get(u)))
+            rows = _parse(_cached(
+                f"funding/{urllib.parse.quote(symbol, safe='')}/{fn}",
+                lambda u=url: _get(u)))
         except urllib.error.HTTPError as e:
             if e.code != 404:
                 raise

@@ -71,3 +71,11 @@ def test_load_rejects_unavailable_months(monkeypatch):
     monkeypatch.setattr(feed, "months", lambda s, i="1d": ["2022-06"])
     with pytest.raises(ValueError, match="받을 월이 없다"):
         feed.load("X", "1d", ["2019-01"])
+
+
+def test_non_ascii_symbols_are_encoded_not_dropped():
+    """**한자 심볼이 실제로 상장돼 있다.** 걸러내면 선택편향이다."""
+    assert feed._q("币安人生USDT").startswith("%")
+    assert "USDT" in feed._q("币安人生USDT")
+    assert feed._q("BTCUSDT") == "BTCUSDT"
+    assert feed._q("a/b") == "a/b"        # 경로 구분자는 남긴다
