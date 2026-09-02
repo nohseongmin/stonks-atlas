@@ -41,7 +41,7 @@ m 이 비용과 비슷해지면 p 가 1 로 발산한다. 스캘핑이 수학적
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 #: 무위험수익률. 목표 대비 상한 계산에 쓴다.
 RF = 0.04
@@ -62,8 +62,19 @@ class Venue:
     min_notional_usd: float   # 최소 주문 명목
     max_leverage: float
     funding_bps_per_period: float   # 정산 1 회당 펀딩 (bp), 롱 기준 부호
+    #: **청산수수료(명목 대비).** 수수료 항목 중 압도적으로 크다 —
+    #: 바이낸스 1.25% 는 테이커 체결 **25 회분**이고 유지증거금(0.40%)의 3.1 배다.
+    #: 그래서 청산은 **언제나 전액 손실**이다: L=10 이면 이 수수료만 자본의 12.5%
+    #: 인데 그 시점에 남아 있는 증거금은 자본의 4% 뿐이라 보험기금이 메운다.
+    #: 비용 모델에서 5bp 를 다듬는 것보다 청산 한 번을 피하는 게 비교가 안 되게 크다.
+    liquidation_fee_bps: float = 0.0
+    maintenance_margin: float = 0.004   # 유지증거금률
     source: str = ""
     verified: bool = False
+
+    def liquidation_cost_frac(self, leverage: float) -> float:
+        """청산 한 번이 **자기 자본** 대비 얼마인가. 증거금 전액 + 청산수수료."""
+        return leverage * self.liquidation_fee_bps / 1e4
 
     def round_trip_bps(self, maker: bool = False) -> float:
         """왕복 총비용(bp). **명목 대비**이므로 레버리지와 무관하다."""
@@ -117,7 +128,36 @@ BINANCE_USDM = Venue(
     min_notional_usd=MIN_NOTIONAL_USD["BTCUSDT"],
     max_leverage=125.0,
     funding_bps_per_period=annual_to_bps_per_period(FUNDING_ANNUAL_180D["BTCUSDT"]),
-    source="수수료·펀딩·최소명목·스프레드 실측 2026-09-02 · 수수료는 3자 출처",
+    liquidation_fee_bps=125.0,    # [검증] exchangeInfo liquidationFee 0.0125
+    maintenance_margin=0.004,     # [검증] 1 구간(0~300k USDT), 최대 150 배
+    source="바이낸스 자체 API·bapi 로 확인 2026-09-02",
+    verified=True,
+)
+
+#: BNB 로 수수료를 내면 **선물은 10% 할인**이다(현물 25% 와 다르다).
+BINANCE_USDM_BNB = replace(BINANCE_USDM, name="binance-usdm+bnb",
+                           taker_bps=4.5, maker_bps=1.8)
+
+#: 하이퍼리퀴드 — **가장 싸고, 한국을 차단하지 않고, KYC 가 없다.**
+#: 미국·온타리오·OFAC 만 지오펜싱. 거래 가스 0, 출금 $1.
+HYPERLIQUID = Venue(
+    name="hyperliquid",
+    taker_bps=4.5, maker_bps=1.5,
+    spread_bps=SPREAD_BPS["BTCUSDT"],   # **미측정** — 바이낸스 값을 빌려 씀
+    min_notional_usd=10.0,
+    max_leverage=40.0,
+    funding_bps_per_period=annual_to_bps_per_period(FUNDING_ANNUAL_180D["BTCUSDT"]),
+    liquidation_fee_bps=0.0,      # **미확인**
+    source="Hyperliquid 문서 2026-09-02 · 스프레드·청산수수료 미측정",
+    verified=False,
+)
+
+BYBIT = Venue(
+    name="bybit", taker_bps=5.5, maker_bps=2.0,
+    spread_bps=SPREAD_BPS["BTCUSDT"],   # **미측정**
+    min_notional_usd=5.0, max_leverage=100.0,
+    funding_bps_per_period=annual_to_bps_per_period(FUNDING_ANNUAL_180D["BTCUSDT"]),
+    source="Bybit 수수료표 2026-09-02 · 스프레드 미측정",
     verified=False,
 )
 
@@ -226,6 +266,13 @@ def report(capital: float = 100.0, venue: Venue = BINANCE_USDM,
     for lev in (1, 3, 5, 10, 20):
         print(f"{lev:>4}{ann*lev*100:>12.1f}%{ann*lev/DAYS_PER_YEAR*100:>8.2f}%")
     print("(숏이면 같은 크기를 받는다. 최근 180 일 실측이고 2021 년엔 이 11 배였다)")
+
+    if venue.liquidation_fee_bps:
+        turns = venue.liquidation_fee_bps / venue.taker_bps
+        print(f"\n청산수수료 {venue.liquidation_fee_bps/1e2:.2f}% "
+              f"= **테이커 체결 {turns:.0f} 회분** (유지증거금 "
+              f"{venue.maintenance_margin*100:.2f}% 의 {venue.liquidation_fee_bps/1e4/venue.maintenance_margin:.1f}배)")
+        print("수수료 5bp 를 다듬는 것보다 청산 한 번을 피하는 게 비교가 안 되게 크다.")
 
 
 if __name__ == "__main__":

@@ -71,9 +71,9 @@ def test_max_cagr_ceiling():
 
 
 def test_liquidation_move_shrinks_with_leverage():
-    assert liquidation_move(10, 0.005) == pytest.approx(0.095)
-    assert liquidation_move(100, 0.005) == pytest.approx(0.005)
-    assert liquidation_move(500, 0.005) == 0.0
+    assert liquidation_move(10, 0.004) == pytest.approx(0.096)
+    assert liquidation_move(100, 0.004) == pytest.approx(0.006)
+    assert liquidation_move(500, 0.004) == 0.0
     with pytest.raises(ValueError):
         liquidation_move(0)
 
@@ -84,10 +84,11 @@ def test_annual_funding_converts_to_period():
     assert annual_to_bps_per_period(0.0) == 0.0
 
 
-def test_binance_venue_is_not_marked_verified():
-    """스프레드가 미검증인 동안 규격 전체가 검증됐다고 말하면 안 된다."""
-    from dump.costs import BINANCE_USDM
-    assert not BINANCE_USDM.verified
+def test_binance_venue_is_verified_others_are_not():
+    """검증 플래그가 실제 상태를 말해야 한다. 안 잰 건 안 잰 거다."""
+    from dump.costs import BINANCE_USDM, BYBIT, HYPERLIQUID
+    assert BINANCE_USDM.verified            # 수수료·스프레드·펀딩 전부 실측
+    assert not HYPERLIQUID.verified and not BYBIT.verified   # 스프레드 미측정
     assert BINANCE_USDM.taker_bps == 5.0
     assert BINANCE_USDM.min_notional_usd == pytest.approx(77.58)
     assert BINANCE_USDM.round_trip_bps() == pytest.approx(10.0129)
@@ -103,3 +104,28 @@ def test_maker_only_loses_to_fees_on_btc():
     captured = SPREAD_BPS["BTCUSDT"]
     maker_cost = 2 * BINANCE_USDM.maker_bps
     assert captured - maker_cost == pytest.approx(-3.9871)
+
+
+def test_liquidation_fee_dwarfs_trading_fees():
+    """**청산 한 번 = 테이커 체결 25 회분.** 비용 모델의 진짜 주인공.
+
+    그리고 청산은 언제나 전액 손실이다 — L=10 에서 수수료만 자본의 12.5% 인데
+    그 시점에 남은 증거금은 자본의 4%(명목의 0.40%) 뿐이다.
+    """
+    from dump.costs import BINANCE_USDM as V
+    assert V.liquidation_fee_bps / V.taker_bps == pytest.approx(25.0)
+    assert V.liquidation_cost_frac(10) == pytest.approx(0.125)
+    assert V.liquidation_cost_frac(10) > V.maintenance_margin * 10
+
+
+def test_bnb_discount_is_ten_percent_on_futures():
+    """선물은 10%, 현물은 25%. 섞으면 비용을 낙관하게 된다."""
+    from dump.costs import BINANCE_USDM, BINANCE_USDM_BNB
+    assert BINANCE_USDM_BNB.taker_bps == pytest.approx(BINANCE_USDM.taker_bps * 0.9)
+    assert BINANCE_USDM_BNB.liquidation_fee_bps == BINANCE_USDM.liquidation_fee_bps
+
+
+def test_hyperliquid_is_cheaper_than_binance():
+    from dump.costs import BINANCE_USDM, BYBIT, HYPERLIQUID
+    assert HYPERLIQUID.round_trip_bps() < BINANCE_USDM.round_trip_bps() < BYBIT.round_trip_bps()
+    assert not HYPERLIQUID.verified          # 스프레드를 안 쟀다

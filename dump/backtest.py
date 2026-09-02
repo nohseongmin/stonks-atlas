@@ -98,8 +98,9 @@ class Result:
 
 
 #: 유지증거금률. 거래소·명목티어마다 다르다. 정찰 후 Venue 로 옮긴다.
-# ponytail: 단일 값 근사. 실제는 명목 구간별 계단식 — 큰 계좌 다루게 되면 티어표로 교체.
-MAINTENANCE_MARGIN = 0.005
+# [검증] BTCUSDT·ETHUSDT 1구간(0~300,000 USDT) 0.40%, 최대 150배.
+# ponytail: 1구간 값만 쓴다. $100 계좌는 이 구간을 벗어날 일이 없다.
+MAINTENANCE_MARGIN = 0.004
 
 
 def run(bars: Bars, rule, venue: Venue, capital: float = 100.0,
