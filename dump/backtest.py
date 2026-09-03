@@ -219,6 +219,20 @@ def _index(bars: dict[str, Bars], axis: list[int]) -> dict[str, list[int | None]
     return out
 
 
+def _funding_index(bars: dict[str, Bars], axis: list[int]) -> dict[str, list[int]]:
+    """축의 각 자리까지 **정산이 끝난** 펀딩 건수.
+
+    펀딩은 봉이 아니라 8 시간 이벤트라 축에 1:1 로 안 붙는다. 규칙 함수가
+    `t` 시점까지의 펀딩만 보게 하려면 이 개수로 잘라줘야 한다.
+    """
+    import bisect
+    out = {}
+    for sym, b in bars.items():
+        ts = [f[0] for f in b.funding]
+        out[sym] = [bisect.bisect_right(ts, t) for t in axis]
+    return out
+
+
 def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
                       capital: float = 100.0, rebalance: int = 7,
                       maker: bool = False) -> Result:
@@ -250,6 +264,7 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
         raise ValueError(f"리밸런싱 간격은 1 이상이어야 한다: {rebalance}")
 
     idx = _index(bars, axis)
+    fidx = _funding_index(bars, axis)
     fee = (venue.maker_bps if maker else venue.taker_bps) / 1e4
     one_way = fee + venue.spread_bps / 2e4
 
@@ -265,9 +280,12 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
         live = [s for s, ix in idx.items() if ix[t] is not None]
 
         if t % rebalance == 0:
-            past = {s: {k: PastView(getattr(bars[s], k), idx[s][t])
-                        for k in ("ts", "open", "high", "low", "close", "qvol")}
-                    for s in live}
+            past = {}
+            for s in live:
+                d = {k: PastView(getattr(bars[s], k), idx[s][t])
+                     for k in ("ts", "open", "high", "low", "close", "qvol")}
+                d["funding"] = PastView(bars[s].funding, fidx[s][t] - 1)
+                past[s] = d
             want = rule(t, past, live)
             if want is not None:
                 want = {s: float(w) for s, w in want.items() if w}
