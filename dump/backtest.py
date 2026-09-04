@@ -242,7 +242,7 @@ def _funding_index(bars: dict[str, Bars], axis: list[int]) -> dict[str, list[int
 
 def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
                       capital: float = 100.0, rebalance: int = 7,
-                      maker: bool = False) -> Result:
+                      maker: bool = False, extra: dict | None = None) -> Result:
     """횡단면 전략. `rule(t, past, live) -> {심볼: 가중치}` 를 리밸런싱마다 부른다.
 
     `live` 는 **그 시점에 실제로 거래되던 심볼**이다. 상폐된 것도 살아 있던
@@ -272,6 +272,8 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
 
     idx = _index(bars, axis)
     fidx = _funding_index(bars, axis)
+    #: 심볼 -> 축 정렬된 일별 부가자료(오픈인터레스트 등). 없으면 빈 dict.
+    ext = extra or {}
     fee = (venue.maker_bps if maker else venue.taker_bps) / 1e4
     one_way = fee + venue.spread_bps / 2e4
 
@@ -293,6 +295,9 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
                 d = {k: PastView(getattr(bars[s], k), idx[s][t])
                      for k in ("ts", "open", "high", "low", "close", "qvol", "tbuy")}
                 d["funding"] = PastView(bars[s].funding, fidx[s][t] - 1)
+                e = ext.get(s)
+                if e is not None:
+                    d["oi"] = PastView(e, t)
                 past[s] = d
             want = rule(t, past, live)
             if want is not None:
