@@ -136,3 +136,13 @@
 {"fp": "db253910f15ce2f0", "name": "IV_riskadj_mom", "spec": {"factor": "riskadj_mom", "dir": 1, "w": "invvol"}, "sharpe": 0.8580364221225516}
 {"fp": "2cd350a0f0faa2a1", "name": "ZOO_ema_multi", "spec": {"factor": "ema_multi", "dir": 1}, "sharpe": -0.08231990010590175}
 {"fp": "2f8b5d91df98c0b4", "name": "IV_ema_multi", "spec": {"factor": "ema_multi", "dir": 1, "w": "invvol"}, "sharpe": -0.10387695071560914}
+{"fp": "8dca62fa8bb385a9", "name": "OI_oi_growth_7", "spec": {"factor": "oi_growth_7", "dir": 1, "src": "oi"}, "sharpe": 0.33096778886290135}
+{"fp": "3a92dfbef3dc4a2f", "name": "OI_oi_growth_30", "spec": {"factor": "oi_growth_30", "dir": 1, "src": "oi"}, "sharpe": 0.1687266681395697}
+{"fp": "6863822ca69e4685", "name": "OI_oi_price_div", "spec": {"factor": "oi_price_div", "dir": 1, "src": "oi"}, "sharpe": 0.11372275873141385}
+{"fp": "655e80d39651fc7d", "name": "OI_oi_to_vol", "spec": {"factor": "oi_to_vol", "dir": -1, "src": "oi"}, "sharpe": -0.06789991484448617}
+{"fp": "4fa1a91a543e10e7", "name": "OI_lsr_retail", "spec": {"factor": "lsr_retail", "dir": -1, "src": "oi"}, "sharpe": 0.9631845782010627}
+{"fp": "cdea48b327b79c07", "name": "OI_lsr_top", "spec": {"factor": "lsr_top", "dir": 1, "src": "oi"}, "sharpe": -1.26542498162629}
+{"fp": "9ea0dd64f53695e4", "name": "OI_lsr_spread", "spec": {"factor": "lsr_spread", "dir": 1, "src": "oi"}, "sharpe": -0.8699421738492042}
+{"fp": "6b82c5fcae156168", "name": "OI_lsr_chg", "spec": {"factor": "lsr_chg", "dir": -1, "src": "oi"}, "sharpe": 1.1374729948004507}
+{"fp": "f19ab6653c58e102", "name": "OI_taker_ls_30", "spec": {"factor": "taker_ls_30", "dir": 1, "src": "oi"}, "sharpe": 0.04563164545684293}
+{"fp": "7f57cab20bc6ffba", "name": "OI_oi_shock_7", "spec": {"factor": "oi_shock_7", "dir": 1, "src": "oi"}, "sharpe": 0.4034133116353168}
