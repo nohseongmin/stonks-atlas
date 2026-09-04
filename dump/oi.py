@@ -71,13 +71,17 @@ def _fold(blob: bytes) -> list[float] | None:
     for r in rows:
         if len(r) < 8:
             continue
+        # **넷을 다 파싱한 뒤에 한꺼번에 넣는다.** 중간에 예외가 나면
+        # 앞의 것만 들어가 배열 길이가 어긋나고, 그러면 fmean 이 빈 리스트를
+        # 받는다(실측: 354 심볼이 여기서 죽었다).
         try:
-            oi.append(float(r[3]))
-            top.append(float(r[4]))
-            acct.append(float(r[6]))
-            taker.append(float(r[7]))
+            a, b, c, d = float(r[3]), float(r[4]), float(r[6]), float(r[7])
         except ValueError:
             continue
+        oi.append(a)
+        top.append(b)
+        acct.append(c)
+        taker.append(d)
     if not oi:
         return None
     # OI 는 **하루 마지막 값**(스톡), 비율은 평균(플로우).

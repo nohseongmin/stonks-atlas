@@ -79,3 +79,30 @@ def test_non_ascii_symbols_are_encoded_not_dropped():
     assert "USDT" in feed._q("币安人生USDT")
     assert feed._q("BTCUSDT") == "BTCUSDT"
     assert feed._q("a/b") == "a/b"        # 경로 구분자는 남긴다
+
+
+def _metrics_zip(rows: str) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("m.csv", rows)
+    return buf.getvalue()
+
+
+def test_oi_fold_skips_bad_rows_without_desyncing():
+    """**넷을 다 파싱한 뒤 한꺼번에 넣는지.**
+
+    중간에 예외가 나면 앞의 배열만 늘어나 fmean 이 빈 리스트를 받는다.
+    실측으로 354 심볼이 이 버그에서 죽었다.
+    """
+    from dump.oi import _fold
+    good = "2024-06-03 00:00:00,X,1,100,2.0,1.5,3.0,0.6"
+    bad = "2024-06-03 00:05:00,X,1,200,,1.5,3.0,0.6"     # 5번째 열이 빈칸
+    v = _fold(_metrics_zip(f"{good}\n{bad}\n{good}\n"))
+    assert v is not None
+    assert v[0] == 100.0            # OI 는 마지막 유효행의 값
+    assert v[1] == pytest.approx(2.0)
+
+
+def test_oi_fold_returns_none_when_nothing_parses():
+    from dump.oi import _fold
+    assert _fold(_metrics_zip("2024-06-03 00:00:00,X,,,,,,\n")) is None
