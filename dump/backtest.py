@@ -98,6 +98,8 @@ class Result:
     trades: int
     liquidated_at: int | None
     bars: int
+    #: 심볼별 누적 손익 기여. **소수 종목이 만든 결과인지** 보는 데 쓴다.
+    contrib: dict = field(default_factory=dict)
 
     @property
     def final(self) -> float:
@@ -279,6 +281,7 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
     funding_cost = 0.0
     trades = 0
     liquidated = None
+    contrib: dict[str, float] = {}
     fpos = {s: 0 for s in bars}
 
     for t in range(n - 1):
@@ -326,7 +329,9 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
             i0, i1 = idx[s][t], idx[s][t + 1]
             c0, c1 = bars[s].close[i0], bars[s].close[i1]
             if c0 > 0:
-                pnl += w * (c1 / c0 - 1)
+                part = w * (c1 / c0 - 1)
+                pnl += part
+                contrib[s] = contrib.get(s, 0.0) + part * eq
         eq *= 1 + pnl
 
         for s, w in held.items():
@@ -345,4 +350,4 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
             break
         equity.append(eq)
 
-    return Result(equity, [], fees, funding_cost, trades, liquidated, n)
+    return Result(equity, [], fees, funding_cost, trades, liquidated, n, contrib)

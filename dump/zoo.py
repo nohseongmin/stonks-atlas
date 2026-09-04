@@ -210,10 +210,13 @@ def build():
     ]
 
 
-def xs_rule(f, bench_rets=None):
+def xs_rule(f, bench_rets=None, quantile=None, exclude=None):
     """Factor 를 횡단면 규칙으로. **분위·유동성 문턱은 #1 과 동일하다.**"""
+    q = QUANTILE if quantile is None else quantile
+    skip = exclude or set()
+
     def rule(t, past, live):
-        pool = _liquid(past, live)
+        pool = [s for s in _liquid(past, live) if s not in skip]
         if not pool:
             return {}
         b = bench_rets(t) if callable(bench_rets) else bench_rets
@@ -235,7 +238,7 @@ def xs_rule(f, bench_rets=None):
         if len(score) < MIN_NAMES:
             return {}
         ranked = sorted(score, key=score.get, reverse=True)
-        k = max(1, int(len(ranked) * QUANTILE))
+        k = max(1, int(len(ranked) * q))
         top, bot = ranked[:k], ranked[-k:]
         side = GROSS_LEVERAGE / 2
         w = {s: side / len(top) for s in top}
