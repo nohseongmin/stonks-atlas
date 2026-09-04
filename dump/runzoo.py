@@ -128,3 +128,80 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def paired(argv: list[str] | None = None) -> int:
+    """PREREG_INVVOL.md — **주 결과는 짝비교 하나다.**
+
+    동일가중 결과는 원장에서 읽는다(같은 지문이라 재실행해도 새 시행이 아니다).
+    신규 3 개만 동일가중으로 돌리고, 52 개 전부를 역변동성으로 돌린다.
+    """
+    from .zoo import build3
+    cfg = GateConfig()
+    bars = load_many(all_symbols(), "1d", MIN_BARS)
+    axis = date_axis(bars)
+    pit = bool(set(bars) - set(live_symbols()))
+    bench = bench_curve(bars, axis, 100.0)
+    bsr = sharpe(returns(bench), cfg.periods_per_year)
+    at = bench_window(bars, axis)
+    hard = stress(BINANCE_USDM, cfg.cost_stress_mult)
+
+    factors = build() + build2() + build3()
+    prior = {t["name"]: t["sharpe"] for t in trials()}
+    print(f"팩터 {len(factors)} · 벤치 {bsr:+.2f} · 통과선 "
+          f"{bsr + cfg.min_margin_vs_bench:+.2f} · 시점정합 {pit}\n")
+
+    rows = []
+    for i, f in enumerate(factors, 1):
+        eq = prior.get(f"ZOO_{f.slug}")
+        if eq is None:                       # 신규 3 개만 여기 걸린다
+            r = run_cross_section(bars, xs_rule(f, at), BINANCE_USDM, 100.0, 7)
+            eq = sharpe(returns(r.equity), cfg.periods_per_year)
+            record(f"ZOO_{f.slug}", {"factor": f.slug, "dir": f.direction}, eq)
+        r = run_cross_section(bars, xs_rule(f, at, invvol=True), BINANCE_USDM,
+                              100.0, 7)
+        iv = sharpe(returns(r.equity), cfg.periods_per_year)
+        record(f"IV_{f.slug}", {"factor": f.slug, "dir": f.direction, "w": "invvol"}, iv)
+        rows.append({"f": f, "eq": eq, "iv": iv, "res": r,
+                     "mdd": max_drawdown(r.equity)})
+        print(f"{i:>3}/{len(factors)} {f.slug:<16}동일 {eq:+.2f} -> 역변동성 {iv:+.2f}"
+              f"  ({iv-eq:+.2f}) · 낙폭 {max_drawdown(r.equity)*100:5.1f}%"
+              f"{'  <- 통과선 초과' if iv >= bsr + cfg.min_margin_vs_bench else ''}",
+              flush=True)
+
+    d = sorted(r["iv"] - r["eq"] for r in rows)
+    med = st.median(d)
+    win = sum(1 for x in d if x > 0)
+    print(f"\n{'='*72}")
+    print(f"**짝비교 — 이게 주 결과다**")
+    print(f"  중앙값 {med:+.3f} · 평균 {st.fmean(d):+.3f} · "
+          f"개선 {win}/{len(d)} · 범위 [{d[0]:+.2f}, {d[-1]:+.2f}]")
+    verdict = ("역변동성이 진짜 값을 더한다" if med >= 0.2 else
+               "역변동성이 엣지를 죽인다" if med <= -0.2 else
+               "**집행 규칙으로는 못 푼다** — 다음은 다른 데이터")
+    print(f"  사전등록 판정: {verdict}")
+
+    led = trials()
+    spread = [t["sharpe"] for t in led]
+    floor = (st.fmean(spread) + st.pstdev(spread) *
+             ((1 - 0.5772156649015329) * math.sqrt(2 * math.log(len(led))) +
+              0.5772156649015329 * math.sqrt(2 * math.log(len(led) / math.e))))
+    print(f"\n원장 {len(led)} 건 · 평균 {st.fmean(spread):+.2f} "
+          f"· 표준편차 {st.pstdev(spread):.2f} · **잡음바닥 {floor:+.2f}**")
+
+    rows.sort(key=lambda x: -x["iv"])
+    print("\n역변동성 상위 8")
+    for r in rows[:8]:
+        print(f"  {r['f'].slug:<16}{r['iv']:+.2f} (동일 {r['eq']:+.2f}) "
+              f"· 낙폭 {r['mdd']*100:5.1f}%")
+
+    live_ones = [r for r in rows if r["iv"] >= bsr + cfg.min_margin_vs_bench]
+    print(f"\n④ 를 넘은 것 {len(live_ones)} 개")
+    for r in live_ones:
+        s = run_cross_section(bars, xs_rule(r["f"], at, invvol=True), hard,
+                              100.0, 7)
+        v = evaluate(r["res"], bench, s, len(led), spread, pit, cfg)
+        print(f"\n── IV_{r['f'].slug} — {'**통과**' if v.passed else '기각'}")
+        for c in v.checks:
+            print(f"   {'OK' if c.ok else '**NG**':<7}{c.name:<12}{c.detail}")
+    return 0

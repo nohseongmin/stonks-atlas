@@ -22,6 +22,8 @@ from dataclasses import dataclass
 from .strategies import GROSS_LEVERAGE, MIN_NAMES, QUANTILE, _liquid
 
 BENCH = "BTCUSDT"
+#: 역변동성 가중 창. 유동성 필터·분위와 같은 30 일로 고정한다.
+INVVOL_WINDOW = 30
 
 
 def rets(close, n):
@@ -210,7 +212,7 @@ def build():
     ]
 
 
-def xs_rule(f, bench_rets=None, quantile=None, exclude=None):
+def xs_rule(f, bench_rets=None, quantile=None, exclude=None, invvol=False):
     """Factor 를 횡단면 규칙으로. **분위·유동성 문턱은 #1 과 동일하다.**"""
     q = QUANTILE if quantile is None else quantile
     skip = exclude or set()
@@ -241,8 +243,25 @@ def xs_rule(f, bench_rets=None, quantile=None, exclude=None):
         k = max(1, int(len(ranked) * q))
         top, bot = ranked[:k], ranked[-k:]
         side = GROSS_LEVERAGE / 2
-        w = {s: side / len(top) for s in top}
-        w.update({s: -side / len(bot) for s in bot})
+        if not invvol:
+            w = {s: side / len(top) for s in top}
+            w.update({s: -side / len(bot) for s in bot})
+            return w
+        # **역변동성 가중.** 변동성 큰 종목이 적게 들어가 어느 하나도 결과를
+        # 지배하지 못한다. 변동성을 못 재는 종목은 그 다리에서 뺀다 —
+        # 평균으로 메우면 조용히 동일가중으로 돌아간다.
+        w = {}
+        for leg, sign in ((top, +1), (bot, -1)):
+            iv = {}
+            for s in leg:
+                v = _sd(rets(past[s]["close"], INVVOL_WINDOW))
+                if v and v > 0:
+                    iv[s] = 1 / v
+            tot = sum(iv.values())
+            if not tot:
+                continue
+            for s, x in iv.items():
+                w[s] = sign * side * x / tot
         return w
     return rule
 
@@ -406,4 +425,65 @@ def build2():
           "30일 모멘텀에서 그 기간 펀딩 비용을 뺀다"),
         F("dbeta_60", "risk", -1, None, "하방베타 — 낮은 쪽 롱 (벤치 주입)"),
         F("coskew_60", "risk", -1, None, "공왜도 — 낮은 쪽 롱 (벤치 주입)"),
+    ]
+
+
+def _fund_z(p, n=90):
+    """펀딩의 **자기 과거 대비 z 점수.** 원 수준과 다른 신호다.
+
+    `OctopusTakopi/funding-rate-alpha` 가 쓴 형태. 우리 `funding_7/30` 은
+    원 수준을 썼고 그게 약했던 이유일 수 있다.
+    """
+    f = p.get("funding")
+    k = n * 3
+    if not f or len(f) < k:
+        return None
+    v = [r for _, r in f[-k:]]
+    sd = _sd(v)
+    return None if not sd else (v[-1] - st.fmean(v)) / sd
+
+
+def _riskadj_mom(p):
+    """30·90·180 일 수익/변동성의 평균. 변동성으로 나눠 규모를 맞춘다."""
+    out = []
+    for n in (30, 90, 180):
+        t, v = total(p["close"], n), _sd(rets(p["close"], n))
+        if t is not None and v:
+            out.append(t / (v * math.sqrt(n)))
+    return st.fmean(out) if len(out) >= 2 else None
+
+
+def _ema(x, span):
+    a = 2 / (span + 1)
+    e = x[0]
+    for v in x[1:]:
+        e += a * (v - e)
+    return e
+
+
+def _ema_multi(p):
+    """다속도 EMA 교차를 가격x변동성으로 정규화해 평균. CTA 저장소 형태."""
+    c = p["close"]
+    if len(c) < 200:
+        return None
+    v = _sd(rets(c, 60))
+    if not v or c[-1] <= 0:
+        return None
+    w = list(c[-200:])
+    out = []
+    for fast, slow in ((16, 48), (32, 96), (64, 192)):
+        out.append((_ema(w, fast) - _ema(w, slow)) / (c[-1] * v))
+    return st.fmean(out)
+
+
+def build3():
+    """깃허브 사냥에서 온 3 개. PREREG_INVVOL.md 에 명세가 있다."""
+    F = Factor
+    return [
+        F("funding_z_90", "carry", -1, lambda p: _fund_z(p),
+          "펀딩 자기 과거 대비 z — 원 수준과 다른 신호"),
+        F("riskadj_mom", "momentum", +1, lambda p: _riskadj_mom(p),
+          "30/90/180 위험조정 수익 복합"),
+        F("ema_multi", "momentum", +1, lambda p: _ema_multi(p),
+          "다속도 EMA 교차, 변동성 정규화"),
     ]
