@@ -13,7 +13,7 @@ from .experiment import BENCH, MIN_BARS, bench_curve, stress
 from .feed import all_symbols, live_symbols, load_many
 from .gate import (GateConfig, cagr, evaluate, max_drawdown, record, returns,
                    sharpe, trials)
-from .zoo import build, xs_rule
+from .zoo import build, build2, xs_rule
 
 BETA_WINDOW = 60
 
@@ -74,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
     at = bench_window(bars, axis)
     hard = stress(BINANCE_USDM, cfg.cost_stress_mult)
 
-    factors = build()
+    factors = build() + build2()
     print(f"적재 {len(bars)} · 축 {len(axis)} 일 · 시점정합 {pit}")
     print(f"벤치 {BENCH} Sharpe {bsr:+.2f} · 통과선 {bsr + cfg.min_margin_vs_bench:+.2f}")
     print(f"팩터 {len(factors)} 개 실행\n")

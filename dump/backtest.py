@@ -69,11 +69,16 @@ class Bars:
     #: 봉별 거래대금(USDT). **유동성 필터에 쓴다** — 10~30bp 로 거래 가능한
     #: 종목만 남기려면 이게 있어야 한다. 없으면 빈 목록.
     qvol: list[float] = field(default_factory=list)
+    #: 봉별 **테이커 매수** 거래대금. `tbuy/qvol` 이 주문흐름 불균형이다.
+    #: klines CSV 10 번 열에 원래 있었는데 안 파싱하고 있었다 — 공짜 차원.
+    tbuy: list[float] = field(default_factory=list)
 
     def __post_init__(self):
         n = len(self.ts)
-        if self.qvol and len(self.qvol) != n:
-            raise ValueError(f"{self.symbol}: qvol 길이가 ts 와 다르다")
+        for extra in ("qvol", "tbuy"):
+            v = getattr(self, extra)
+            if v and len(v) != n:
+                raise ValueError(f"{self.symbol}: {extra} 길이가 ts 와 다르다")
         for name in ("open", "high", "low", "close"):
             if len(getattr(self, name)) != n:
                 raise ValueError(f"{self.symbol}: {name} 길이가 ts 와 다르다")
@@ -283,7 +288,7 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
             past = {}
             for s in live:
                 d = {k: PastView(getattr(bars[s], k), idx[s][t])
-                     for k in ("ts", "open", "high", "low", "close", "qvol")}
+                     for k in ("ts", "open", "high", "low", "close", "qvol", "tbuy")}
                 d["funding"] = PastView(bars[s].funding, fidx[s][t] - 1)
                 past[s] = d
             want = rule(t, past, live)

@@ -176,7 +176,7 @@ def load(symbol: str, interval: str = "1d",
     use = [m for m in (want or have) if m in have]
     if not use:
         raise ValueError(f"{symbol} {interval}: 받을 월이 없다 (가용 {len(have)} 개)")
-    ts, op, hi, lo, cl, qv = [], [], [], [], [], []
+    ts, op, hi, lo, cl, qv, tb = [], [], [], [], [], [], []
     for m in sorted(use):
         fn = f"{symbol}-{interval}-{m}.zip"
         url = f"{DUMP}/{PREFIX}/klines/{_q(symbol)}/{interval}/{_q(fn)}"
@@ -188,7 +188,8 @@ def load(symbol: str, interval: str = "1d",
             lo.append(float(r[3]))
             cl.append(float(r[4]))
             qv.append(float(r[7]))          # quote_volume — 유동성 필터용
-    return Bars(symbol, ts, op, hi, lo, cl, funding(symbol, use), qv)
+            tb.append(float(r[10]))         # taker_buy_quote_volume — 주문흐름
+    return Bars(symbol, ts, op, hi, lo, cl, funding(symbol, use), qv, tb)
 
 
 def funding(symbol: str, want: list[str] | None = None) -> list[tuple[int, float]]:
