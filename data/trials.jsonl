@@ -150,3 +150,10 @@
 {"fp": "e0332f9c66dc831f", "name": "BS_basis_z_60", "spec": {"factor": "basis_z_60", "src": "basis"}, "sharpe": 0.534420310299729}
 {"fp": "08c74c3c08b76169", "name": "BS_basis_chg", "spec": {"factor": "basis_chg", "src": "basis"}, "sharpe": -0.5832744523021801}
 {"fp": "6d075ee3497b32a7", "name": "BS_basis_resid", "spec": {"factor": "basis_resid", "src": "basis"}, "sharpe": 0.5608762903561112}
+{"fp": "e219d522850c79c5", "name": "TM_tsmom_90", "spec": {"factor": "tsmom_90", "src": "timing"}, "sharpe": 0.8001079178287057}
+{"fp": "d9b89bf192380bc1", "name": "TM_tsmom_180", "spec": {"factor": "tsmom_180", "src": "timing"}, "sharpe": 0.7853087736643688}
+{"fp": "bf3876d0edf4a0bc", "name": "TM_sma_50_200", "spec": {"factor": "sma_50_200", "src": "timing"}, "sharpe": 0.6532146450138453}
+{"fp": "15f8cb043ddcb7b7", "name": "TM_donchian_55t", "spec": {"factor": "donchian_55t", "src": "timing"}, "sharpe": 0.7441401138622838}
+{"fp": "b53ab44236567641", "name": "TM_ema_cta", "spec": {"factor": "ema_cta", "src": "timing"}, "sharpe": 0.8344803211981233}
+{"fp": "9ba61907f4d9c503", "name": "TM_vol_target_20", "spec": {"factor": "vol_target_20", "src": "timing"}, "sharpe": 0.6407167729147423}
+{"fp": "d266018bc11a9ce1", "name": "TM_dd_derisk", "spec": {"factor": "dd_derisk", "src": "timing"}, "sharpe": 0.7004898114893582}
