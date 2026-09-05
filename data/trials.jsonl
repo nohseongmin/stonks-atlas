@@ -146,3 +146,7 @@
 {"fp": "6b82c5fcae156168", "name": "OI_lsr_chg", "spec": {"factor": "lsr_chg", "dir": -1, "src": "oi"}, "sharpe": 1.1374729948004507}
 {"fp": "f19ab6653c58e102", "name": "OI_taker_ls_30", "spec": {"factor": "taker_ls_30", "dir": 1, "src": "oi"}, "sharpe": 0.04563164545684293}
 {"fp": "7f57cab20bc6ffba", "name": "OI_oi_shock_7", "spec": {"factor": "oi_shock_7", "dir": 1, "src": "oi"}, "sharpe": 0.4034133116353168}
+{"fp": "5513bbfd099b9a14", "name": "BS_basis_7", "spec": {"factor": "basis_7", "src": "basis"}, "sharpe": 0.2767000679538879}
+{"fp": "e0332f9c66dc831f", "name": "BS_basis_z_60", "spec": {"factor": "basis_z_60", "src": "basis"}, "sharpe": 0.534420310299729}
+{"fp": "08c74c3c08b76169", "name": "BS_basis_chg", "spec": {"factor": "basis_chg", "src": "basis"}, "sharpe": -0.5832744523021801}
+{"fp": "6d075ee3497b32a7", "name": "BS_basis_resid", "spec": {"factor": "basis_resid", "src": "basis"}, "sharpe": 0.5608762903561112}

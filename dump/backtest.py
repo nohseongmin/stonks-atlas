@@ -272,8 +272,10 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
 
     idx = _index(bars, axis)
     fidx = _funding_index(bars, axis)
-    #: 심볼 -> 축 정렬된 일별 부가자료(오픈인터레스트 등). 없으면 빈 dict.
-    ext = extra or {}
+    #: 심볼 -> {이름: 축 정렬된 일별 배열}. 오픈인터레스트·현물 등.
+    #: 값이 dict 가 아니면 예전 형태(oi 하나)로 보고 감싸준다.
+    ext = {s: (v if isinstance(v, dict) else {"oi": v})
+           for s, v in (extra or {}).items()}
     fee = (venue.maker_bps if maker else venue.taker_bps) / 1e4
     one_way = fee + venue.spread_bps / 2e4
 
@@ -295,9 +297,8 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
                 d = {k: PastView(getattr(bars[s], k), idx[s][t])
                      for k in ("ts", "open", "high", "low", "close", "qvol", "tbuy")}
                 d["funding"] = PastView(bars[s].funding, fidx[s][t] - 1)
-                e = ext.get(s)
-                if e is not None:
-                    d["oi"] = PastView(e, t)
+                for name, arr in ext.get(s, {}).items():
+                    d[name] = PastView(arr, t)
                 past[s] = d
             want = rule(t, past, live)
             if want is not None:
