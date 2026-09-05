@@ -1,0 +1,159 @@
+{"fp": "7fb907c3e95ca5d3", "name": "LTW_모멘텀_L7", "spec": {"lookback": 7, "long_only": false}, "sharpe": 0.4015995671172896}
+{"fp": "21d648f195c3c952", "name": "LTW_모멘텀_L14", "spec": {"lookback": 14, "long_only": false}, "sharpe": 0.81921789841633}
+{"fp": "8d98cbfc07f4c30c", "name": "LTW_모멘텀_L7_롱온리", "spec": {"lookback": 7, "long_only": true}, "sharpe": 0.7067200425185898}
+{"fp": "c77444cbaa57fd84", "name": "조합_고정50", "spec": {"rule": "fixed", "ltw": 0.5, "bench": 0.5}, "sharpe": 1.0294881872891013}
+{"fp": "eb8a1697a4f82dae", "name": "조합_역변동성", "spec": {"rule": "inverse_vol", "window": 90}, "sharpe": 1.0572065722049728}
+{"fp": "8a6b1845625951d5", "name": "ZOO_mom_7", "spec": {"factor": "mom_7", "dir": 1}, "sharpe": 0.4015995671172896}
+{"fp": "9da93e5fa4a28dac", "name": "ZOO_mom_14", "spec": {"factor": "mom_14", "dir": 1}, "sharpe": 0.81921789841633}
+{"fp": "320daf7c72f9d185", "name": "ZOO_mom_21", "spec": {"factor": "mom_21", "dir": 1}, "sharpe": 0.38348602820175887}
+{"fp": "68093d9dee549fd3", "name": "ZOO_mom_30", "spec": {"factor": "mom_30", "dir": 1}, "sharpe": 0.6547149469626232}
+{"fp": "7fede61cc3472b6f", "name": "ZOO_mom_90", "spec": {"factor": "mom_90", "dir": 1}, "sharpe": 0.49478186390794665}
+{"fp": "0d992bc26922d5dc", "name": "ZOO_mom_skip", "spec": {"factor": "mom_skip", "dir": 1}, "sharpe": 0.17988184740166235}
+{"fp": "57aae907a231df94", "name": "ZOO_rev_1", "spec": {"factor": "rev_1", "dir": -1}, "sharpe": -0.5570855632413183}
+{"fp": "e318f55225eb8389", "name": "ZOO_rev_3", "spec": {"factor": "rev_3", "dir": -1}, "sharpe": -0.679740816556138}
+{"fp": "dec5ab62239b5a6a", "name": "ZOO_rev_90", "spec": {"factor": "rev_90", "dir": -1}, "sharpe": -0.5841443800497944}
+{"fp": "6eeb4990457b2029", "name": "ZOO_rev_180", "spec": {"factor": "rev_180", "dir": -1}, "sharpe": -0.22717843406763172}
+{"fp": "cad5c42f4ef49639", "name": "ZOO_lowvol_30", "spec": {"factor": "lowvol_30", "dir": -1}, "sharpe": -0.5313311080871815}
+{"fp": "912ca3bc43b97b06", "name": "ZOO_lowvol_90", "spec": {"factor": "lowvol_90", "dir": -1}, "sharpe": -0.4427533793642841}
+{"fp": "3fa108c379e60e47", "name": "ZOO_downside_30", "spec": {"factor": "downside_30", "dir": -1}, "sharpe": -0.03338195540427345}
+{"fp": "e30a5279d1a7261f", "name": "ZOO_max_ret_30", "spec": {"factor": "max_ret_30", "dir": -1}, "sharpe": -0.7158356764370156}
+{"fp": "716c014ccc01919d", "name": "ZOO_skew_30", "spec": {"factor": "skew_30", "dir": -1}, "sharpe": -0.8289874219246679}
+{"fp": "84ee40cf70fd953e", "name": "ZOO_kurt_30", "spec": {"factor": "kurt_30", "dir": -1}, "sharpe": -0.4232177232123972}
+{"fp": "7b4a8fa09449ccc2", "name": "ZOO_range_30", "spec": {"factor": "range_30", "dir": -1}, "sharpe": -0.22707943020673718}
+{"fp": "8745904fadb15f7b", "name": "ZOO_drawdown_60", "spec": {"factor": "drawdown_60", "dir": 1}, "sharpe": 0.5814046612124325}
+{"fp": "9b28a465ba6a9986", "name": "ZOO_high_252", "spec": {"factor": "high_252", "dir": 1}, "sharpe": 0.06668509282764512}
+{"fp": "972cde6ac202a56c", "name": "ZOO_amihud_30", "spec": {"factor": "amihud_30", "dir": 1}, "sharpe": 0.8241316262034236}
+{"fp": "f41f70853d5273d6", "name": "ZOO_dollar_vol", "spec": {"factor": "dollar_vol", "dir": -1}, "sharpe": 0.5680325220727309}
+{"fp": "60c5542f548c97d3", "name": "ZOO_vol_shock_7", "spec": {"factor": "vol_shock_7", "dir": 1}, "sharpe": -0.18565415061117407}
+{"fp": "255fa90c29b094ef", "name": "ZOO_updays_30", "spec": {"factor": "updays_30", "dir": 1}, "sharpe": 0.9091594521125927}
+{"fp": "d5f05752f42e9021", "name": "ZOO_price_level", "spec": {"factor": "price_level", "dir": -1}, "sharpe": 0.5841460563010344}
+{"fp": "156154ef4167b486", "name": "ZOO_funding_7", "spec": {"factor": "funding_7", "dir": -1}, "sharpe": 0.5545974546641914}
+{"fp": "9735563224b348be", "name": "ZOO_funding_30", "spec": {"factor": "funding_30", "dir": -1}, "sharpe": 0.20600166674808038}
+{"fp": "b908e1fc6efd8000", "name": "ZOO_funding_chg", "spec": {"factor": "funding_chg", "dir": -1}, "sharpe": 0.748151425819102}
+{"fp": "b6cf513e62973042", "name": "ZOO_beta_60", "spec": {"factor": "beta_60", "dir": -1}, "sharpe": 0.10030399322781854}
+{"fp": "c70cd168972210b5", "name": "ZOO_idio_60", "spec": {"factor": "idio_60", "dir": -1}, "sharpe": -0.4410999573501959}
+{"fp": "8a6b1845625951d5", "name": "ZOO_mom_7", "spec": {"factor": "mom_7", "dir": 1}, "sharpe": 0.4015995671172896}
+{"fp": "9da93e5fa4a28dac", "name": "ZOO_mom_14", "spec": {"factor": "mom_14", "dir": 1}, "sharpe": 0.81921789841633}
+{"fp": "320daf7c72f9d185", "name": "ZOO_mom_21", "spec": {"factor": "mom_21", "dir": 1}, "sharpe": 0.38348602820175887}
+{"fp": "68093d9dee549fd3", "name": "ZOO_mom_30", "spec": {"factor": "mom_30", "dir": 1}, "sharpe": 0.6547149469626232}
+{"fp": "7fede61cc3472b6f", "name": "ZOO_mom_90", "spec": {"factor": "mom_90", "dir": 1}, "sharpe": 0.49478186390794665}
+{"fp": "0d992bc26922d5dc", "name": "ZOO_mom_skip", "spec": {"factor": "mom_skip", "dir": 1}, "sharpe": 0.17988184740166235}
+{"fp": "57aae907a231df94", "name": "ZOO_rev_1", "spec": {"factor": "rev_1", "dir": -1}, "sharpe": -0.5570855632413183}
+{"fp": "e318f55225eb8389", "name": "ZOO_rev_3", "spec": {"factor": "rev_3", "dir": -1}, "sharpe": -0.679740816556138}
+{"fp": "dec5ab62239b5a6a", "name": "ZOO_rev_90", "spec": {"factor": "rev_90", "dir": -1}, "sharpe": -0.5841443800497944}
+{"fp": "6eeb4990457b2029", "name": "ZOO_rev_180", "spec": {"factor": "rev_180", "dir": -1}, "sharpe": -0.22717843406763172}
+{"fp": "cad5c42f4ef49639", "name": "ZOO_lowvol_30", "spec": {"factor": "lowvol_30", "dir": -1}, "sharpe": -0.5313311080871815}
+{"fp": "912ca3bc43b97b06", "name": "ZOO_lowvol_90", "spec": {"factor": "lowvol_90", "dir": -1}, "sharpe": -0.4427533793642841}
+{"fp": "3fa108c379e60e47", "name": "ZOO_downside_30", "spec": {"factor": "downside_30", "dir": -1}, "sharpe": -0.03338195540427345}
+{"fp": "e30a5279d1a7261f", "name": "ZOO_max_ret_30", "spec": {"factor": "max_ret_30", "dir": -1}, "sharpe": -0.7158356764370156}
+{"fp": "716c014ccc01919d", "name": "ZOO_skew_30", "spec": {"factor": "skew_30", "dir": -1}, "sharpe": -0.8289874219246679}
+{"fp": "84ee40cf70fd953e", "name": "ZOO_kurt_30", "spec": {"factor": "kurt_30", "dir": -1}, "sharpe": -0.4232177232123972}
+{"fp": "7b4a8fa09449ccc2", "name": "ZOO_range_30", "spec": {"factor": "range_30", "dir": -1}, "sharpe": -0.22707943020673718}
+{"fp": "8745904fadb15f7b", "name": "ZOO_drawdown_60", "spec": {"factor": "drawdown_60", "dir": 1}, "sharpe": 0.5814046612124325}
+{"fp": "9b28a465ba6a9986", "name": "ZOO_high_252", "spec": {"factor": "high_252", "dir": 1}, "sharpe": 0.06668509282764512}
+{"fp": "972cde6ac202a56c", "name": "ZOO_amihud_30", "spec": {"factor": "amihud_30", "dir": 1}, "sharpe": 0.8241316262034236}
+{"fp": "f41f70853d5273d6", "name": "ZOO_dollar_vol", "spec": {"factor": "dollar_vol", "dir": -1}, "sharpe": 0.5680325220727309}
+{"fp": "60c5542f548c97d3", "name": "ZOO_vol_shock_7", "spec": {"factor": "vol_shock_7", "dir": 1}, "sharpe": -0.18565415061117407}
+{"fp": "255fa90c29b094ef", "name": "ZOO_updays_30", "spec": {"factor": "updays_30", "dir": 1}, "sharpe": 0.9091594521125927}
+{"fp": "d5f05752f42e9021", "name": "ZOO_price_level", "spec": {"factor": "price_level", "dir": -1}, "sharpe": 0.5841460563010344}
+{"fp": "156154ef4167b486", "name": "ZOO_funding_7", "spec": {"factor": "funding_7", "dir": -1}, "sharpe": 0.5545974546641914}
+{"fp": "9735563224b348be", "name": "ZOO_funding_30", "spec": {"factor": "funding_30", "dir": -1}, "sharpe": 0.20600166674808038}
+{"fp": "b908e1fc6efd8000", "name": "ZOO_funding_chg", "spec": {"factor": "funding_chg", "dir": -1}, "sharpe": 0.748151425819102}
+{"fp": "b6cf513e62973042", "name": "ZOO_beta_60", "spec": {"factor": "beta_60", "dir": -1}, "sharpe": 0.10030399322781854}
+{"fp": "c70cd168972210b5", "name": "ZOO_idio_60", "spec": {"factor": "idio_60", "dir": -1}, "sharpe": -0.4410999573501959}
+{"fp": "63a31a05e0ad65fc", "name": "ZOO_gk_vol_30", "spec": {"factor": "gk_vol_30", "dir": -1}, "sharpe": -0.29061898052372975}
+{"fp": "a9effc4667aaefc1", "name": "ZOO_rsi_14", "spec": {"factor": "rsi_14", "dir": -1}, "sharpe": -1.3457187549576983}
+{"fp": "b924fb0e4e5ffda4", "name": "ZOO_stoch_14", "spec": {"factor": "stoch_14", "dir": -1}, "sharpe": -0.8558610146339803}
+{"fp": "6a8faa66ba82caf4", "name": "ZOO_cci_20", "spec": {"factor": "cci_20", "dir": -1}, "sharpe": -1.350992801956412}
+{"fp": "207227d12a3ed37b", "name": "ZOO_sma_dist_20", "spec": {"factor": "sma_dist_20", "dir": 1}, "sharpe": 0.4358208930370355}
+{"fp": "438dc5c6dd72710e", "name": "ZOO_ppo_12_26", "spec": {"factor": "ppo_12_26", "dir": 1}, "sharpe": 0.38786664903586243}
+{"fp": "a9c767192deae185", "name": "ZOO_ctrend", "spec": {"factor": "ctrend", "dir": 1}, "sharpe": 0.5075603769697956}
+{"fp": "56cfe3aeb0971031", "name": "ZOO_donchian_55", "spec": {"factor": "donchian_55", "dir": 1}, "sharpe": 0.9365178096831215}
+{"fp": "eb8764671e0a4fb1", "name": "ZOO_mom_skip_180_30", "spec": {"factor": "mom_skip_180_30", "dir": 1}, "sharpe": -0.04721205613033373}
+{"fp": "4fdf961b4aa0a196", "name": "ZOO_maxd_prc", "spec": {"factor": "maxd_prc", "dir": -1}, "sharpe": 0.678226613099989}
+{"fp": "7ca5b9c7c93211c7", "name": "ZOO_std_prcvol", "spec": {"factor": "std_prcvol", "dir": -1}, "sharpe": -0.0585102538278641}
+{"fp": "8d93314c000f16a7", "name": "ZOO_vol_ratio_50_200", "spec": {"factor": "vol_ratio_50_200", "dir": 1}, "sharpe": 0.237002212290673}
+{"fp": "7850855d57365e07", "name": "ZOO_abnormal_vol_30", "spec": {"factor": "abnormal_vol_30", "dir": 1}, "sharpe": 0.22347951192600543}
+{"fp": "3b9c8e8d940660e9", "name": "ZOO_downside_var_30", "spec": {"factor": "downside_var_30", "dir": -1}, "sharpe": -0.42454540074935276}
+{"fp": "41140a7d991d2ab1", "name": "ZOO_taker_imb_7", "spec": {"factor": "taker_imb_7", "dir": 1}, "sharpe": 1.0838508125355637}
+{"fp": "0c7129d4e6d6bb88", "name": "ZOO_taker_imb_30", "spec": {"factor": "taker_imb_30", "dir": 1}, "sharpe": 1.5549467492061815}
+{"fp": "ae1ee95d3a9095eb", "name": "ZOO_taker_imb_chg", "spec": {"factor": "taker_imb_chg", "dir": 1}, "sharpe": 0.06993151223368554}
+{"fp": "d9d263db28e90d34", "name": "ZOO_funding_adj_mom", "spec": {"factor": "funding_adj_mom", "dir": 1}, "sharpe": 0.7285138651035473}
+{"fp": "6e94d1b2e1a7d248", "name": "ZOO_dbeta_60", "spec": {"factor": "dbeta_60", "dir": -1}, "sharpe": -0.32841863831549145}
+{"fp": "125d8c8b65624656", "name": "ZOO_coskew_60", "spec": {"factor": "coskew_60", "dir": -1}, "sharpe": 0.04364249078955746}
+{"fp": "0f6f769ec39b44f2", "name": "IV_mom_7", "spec": {"factor": "mom_7", "dir": 1, "w": "invvol"}, "sharpe": 0.36532966701937697}
+{"fp": "f9c3f0bbed3ac88f", "name": "IV_mom_14", "spec": {"factor": "mom_14", "dir": 1, "w": "invvol"}, "sharpe": 0.7005691520429405}
+{"fp": "65a4a7bc2b2d28e6", "name": "IV_mom_21", "spec": {"factor": "mom_21", "dir": 1, "w": "invvol"}, "sharpe": 0.5664218462083483}
+{"fp": "f1434b5aa4835362", "name": "IV_mom_30", "spec": {"factor": "mom_30", "dir": 1, "w": "invvol"}, "sharpe": 0.7508618047857233}
+{"fp": "a7bb2af570d104ee", "name": "IV_mom_90", "spec": {"factor": "mom_90", "dir": 1, "w": "invvol"}, "sharpe": 0.507302827607918}
+{"fp": "a35ea54e849bf335", "name": "IV_mom_skip", "spec": {"factor": "mom_skip", "dir": 1, "w": "invvol"}, "sharpe": 0.19089815143822375}
+{"fp": "6744a849023953a7", "name": "IV_rev_1", "spec": {"factor": "rev_1", "dir": -1, "w": "invvol"}, "sharpe": -0.3564863076827803}
+{"fp": "483207fa54dd5676", "name": "IV_rev_3", "spec": {"factor": "rev_3", "dir": -1, "w": "invvol"}, "sharpe": -0.7327130952185041}
+{"fp": "7360a3ec38cc81f9", "name": "IV_rev_90", "spec": {"factor": "rev_90", "dir": -1, "w": "invvol"}, "sharpe": -0.6177255314395572}
+{"fp": "34049ceefe3d32bc", "name": "IV_rev_180", "spec": {"factor": "rev_180", "dir": -1, "w": "invvol"}, "sharpe": -0.11739552270946325}
+{"fp": "0a08b41bc2e5e02f", "name": "IV_lowvol_30", "spec": {"factor": "lowvol_30", "dir": -1, "w": "invvol"}, "sharpe": -0.4648315926429427}
+{"fp": "baad26315c4ec7e8", "name": "IV_lowvol_90", "spec": {"factor": "lowvol_90", "dir": -1, "w": "invvol"}, "sharpe": -0.3766548650387413}
+{"fp": "906463aabfee1059", "name": "IV_downside_30", "spec": {"factor": "downside_30", "dir": -1, "w": "invvol"}, "sharpe": 0.03493865902001344}
+{"fp": "f30aa7dc030c108a", "name": "IV_max_ret_30", "spec": {"factor": "max_ret_30", "dir": -1, "w": "invvol"}, "sharpe": -0.6492473616003966}
+{"fp": "e5e134bdb2bf05f1", "name": "IV_skew_30", "spec": {"factor": "skew_30", "dir": -1, "w": "invvol"}, "sharpe": -0.861542046669572}
+{"fp": "efc605b8c0ea25c7", "name": "IV_kurt_30", "spec": {"factor": "kurt_30", "dir": -1, "w": "invvol"}, "sharpe": -0.5758983494042368}
+{"fp": "5175a0eac10286d7", "name": "IV_range_30", "spec": {"factor": "range_30", "dir": -1, "w": "invvol"}, "sharpe": -0.2245817875058669}
+{"fp": "d57b6ec242ce6167", "name": "IV_drawdown_60", "spec": {"factor": "drawdown_60", "dir": 1, "w": "invvol"}, "sharpe": 0.49318878641779534}
+{"fp": "d4afb2bc0148cefa", "name": "IV_high_252", "spec": {"factor": "high_252", "dir": 1, "w": "invvol"}, "sharpe": 0.2973173599581495}
+{"fp": "511f0e733777e99a", "name": "IV_amihud_30", "spec": {"factor": "amihud_30", "dir": 1, "w": "invvol"}, "sharpe": 0.4832185655756577}
+{"fp": "ecb9ec9235c10527", "name": "IV_dollar_vol", "spec": {"factor": "dollar_vol", "dir": -1, "w": "invvol"}, "sharpe": 0.24204317262500405}
+{"fp": "be48c8cff195e24f", "name": "IV_vol_shock_7", "spec": {"factor": "vol_shock_7", "dir": 1, "w": "invvol"}, "sharpe": -0.0921251052340329}
+{"fp": "6b5ab2c93fae97e9", "name": "IV_updays_30", "spec": {"factor": "updays_30", "dir": 1, "w": "invvol"}, "sharpe": 0.7646720504866509}
+{"fp": "305a695a90012edd", "name": "IV_price_level", "spec": {"factor": "price_level", "dir": -1, "w": "invvol"}, "sharpe": 0.46388566125720515}
+{"fp": "79f0b9931bfac0f8", "name": "IV_funding_7", "spec": {"factor": "funding_7", "dir": -1, "w": "invvol"}, "sharpe": 0.6334224185151431}
+{"fp": "1343e34e16811102", "name": "IV_funding_30", "spec": {"factor": "funding_30", "dir": -1, "w": "invvol"}, "sharpe": 0.45188188015103925}
+{"fp": "73a81c4a986f9d69", "name": "IV_funding_chg", "spec": {"factor": "funding_chg", "dir": -1, "w": "invvol"}, "sharpe": 0.6947853908305486}
+{"fp": "f265df810b33ab9a", "name": "IV_beta_60", "spec": {"factor": "beta_60", "dir": -1, "w": "invvol"}, "sharpe": 0.13875884830835544}
+{"fp": "ab10b6631ffb24a3", "name": "IV_idio_60", "spec": {"factor": "idio_60", "dir": -1, "w": "invvol"}, "sharpe": -0.2863057762923509}
+{"fp": "090e0e226632e29e", "name": "IV_gk_vol_30", "spec": {"factor": "gk_vol_30", "dir": -1, "w": "invvol"}, "sharpe": -0.26341261084598516}
+{"fp": "81166a73e951dc14", "name": "IV_rsi_14", "spec": {"factor": "rsi_14", "dir": -1, "w": "invvol"}, "sharpe": -1.399959632311855}
+{"fp": "fc9f65a0071f61fb", "name": "IV_stoch_14", "spec": {"factor": "stoch_14", "dir": -1, "w": "invvol"}, "sharpe": -0.889447743634552}
+{"fp": "2ff180e46a303c21", "name": "IV_cci_20", "spec": {"factor": "cci_20", "dir": -1, "w": "invvol"}, "sharpe": -1.4893053337929119}
+{"fp": "f2cd37813737e8bc", "name": "IV_sma_dist_20", "spec": {"factor": "sma_dist_20", "dir": 1, "w": "invvol"}, "sharpe": 0.5117728031033966}
+{"fp": "bef1febe77f68fa2", "name": "IV_ppo_12_26", "spec": {"factor": "ppo_12_26", "dir": 1, "w": "invvol"}, "sharpe": 0.5664754612384166}
+{"fp": "8a6786083aee7906", "name": "IV_ctrend", "spec": {"factor": "ctrend", "dir": 1, "w": "invvol"}, "sharpe": 0.5322418589462768}
+{"fp": "df66e240d3cc2c17", "name": "IV_donchian_55", "spec": {"factor": "donchian_55", "dir": 1, "w": "invvol"}, "sharpe": 1.0423628745486773}
+{"fp": "18acec840e9dead0", "name": "IV_mom_skip_180_30", "spec": {"factor": "mom_skip_180_30", "dir": 1, "w": "invvol"}, "sharpe": -0.07499742387247005}
+{"fp": "2e1773c7d540cc39", "name": "IV_maxd_prc", "spec": {"factor": "maxd_prc", "dir": -1, "w": "invvol"}, "sharpe": 0.5598623909471677}
+{"fp": "e5e150321f54846e", "name": "IV_std_prcvol", "spec": {"factor": "std_prcvol", "dir": -1, "w": "invvol"}, "sharpe": -0.02782280402840674}
+{"fp": "68e581fd85537ff4", "name": "IV_vol_ratio_50_200", "spec": {"factor": "vol_ratio_50_200", "dir": 1, "w": "invvol"}, "sharpe": 0.057812779848110195}
+{"fp": "42f89d7d241cf9da", "name": "IV_abnormal_vol_30", "spec": {"factor": "abnormal_vol_30", "dir": 1, "w": "invvol"}, "sharpe": 0.24011865348130645}
+{"fp": "9cea692d594fdc4d", "name": "IV_downside_var_30", "spec": {"factor": "downside_var_30", "dir": -1, "w": "invvol"}, "sharpe": -0.3527455514363214}
+{"fp": "91e78c16abc66772", "name": "IV_taker_imb_7", "spec": {"factor": "taker_imb_7", "dir": 1, "w": "invvol"}, "sharpe": 1.0263088364914759}
+{"fp": "79e24f8721e1ae4c", "name": "IV_taker_imb_30", "spec": {"factor": "taker_imb_30", "dir": 1, "w": "invvol"}, "sharpe": 1.4257096113338397}
+{"fp": "b83be4caa941549c", "name": "IV_taker_imb_chg", "spec": {"factor": "taker_imb_chg", "dir": 1, "w": "invvol"}, "sharpe": 0.13321926797301378}
+{"fp": "90594a73114417ff", "name": "IV_funding_adj_mom", "spec": {"factor": "funding_adj_mom", "dir": 1, "w": "invvol"}, "sharpe": 0.8459769573022959}
+{"fp": "21e42067d80b0a54", "name": "IV_dbeta_60", "spec": {"factor": "dbeta_60", "dir": -1, "w": "invvol"}, "sharpe": -0.09691148934817816}
+{"fp": "4262a88ec9e57204", "name": "IV_coskew_60", "spec": {"factor": "coskew_60", "dir": -1, "w": "invvol"}, "sharpe": -0.03834910670946705}
+{"fp": "b9239468ca433221", "name": "ZOO_funding_z_90", "spec": {"factor": "funding_z_90", "dir": -1}, "sharpe": 0.5233610514124993}
+{"fp": "a21b2873feef6336", "name": "IV_funding_z_90", "spec": {"factor": "funding_z_90", "dir": -1, "w": "invvol"}, "sharpe": 0.4056563697400314}
+{"fp": "f123ebfb90855a1c", "name": "ZOO_riskadj_mom", "spec": {"factor": "riskadj_mom", "dir": 1}, "sharpe": 0.9400233288288309}
+{"fp": "db253910f15ce2f0", "name": "IV_riskadj_mom", "spec": {"factor": "riskadj_mom", "dir": 1, "w": "invvol"}, "sharpe": 0.8580364221225516}
+{"fp": "2cd350a0f0faa2a1", "name": "ZOO_ema_multi", "spec": {"factor": "ema_multi", "dir": 1}, "sharpe": -0.08231990010590175}
+{"fp": "2f8b5d91df98c0b4", "name": "IV_ema_multi", "spec": {"factor": "ema_multi", "dir": 1, "w": "invvol"}, "sharpe": -0.10387695071560914}
+{"fp": "8dca62fa8bb385a9", "name": "OI_oi_growth_7", "spec": {"factor": "oi_growth_7", "dir": 1, "src": "oi"}, "sharpe": 0.33096778886290135}
+{"fp": "3a92dfbef3dc4a2f", "name": "OI_oi_growth_30", "spec": {"factor": "oi_growth_30", "dir": 1, "src": "oi"}, "sharpe": 0.1687266681395697}
+{"fp": "6863822ca69e4685", "name": "OI_oi_price_div", "spec": {"factor": "oi_price_div", "dir": 1, "src": "oi"}, "sharpe": 0.11372275873141385}
+{"fp": "655e80d39651fc7d", "name": "OI_oi_to_vol", "spec": {"factor": "oi_to_vol", "dir": -1, "src": "oi"}, "sharpe": -0.06789991484448617}
+{"fp": "4fa1a91a543e10e7", "name": "OI_lsr_retail", "spec": {"factor": "lsr_retail", "dir": -1, "src": "oi"}, "sharpe": 0.9631845782010627}
+{"fp": "cdea48b327b79c07", "name": "OI_lsr_top", "spec": {"factor": "lsr_top", "dir": 1, "src": "oi"}, "sharpe": -1.26542498162629}
+{"fp": "9ea0dd64f53695e4", "name": "OI_lsr_spread", "spec": {"factor": "lsr_spread", "dir": 1, "src": "oi"}, "sharpe": -0.8699421738492042}
+{"fp": "6b82c5fcae156168", "name": "OI_lsr_chg", "spec": {"factor": "lsr_chg", "dir": -1, "src": "oi"}, "sharpe": 1.1374729948004507}
+{"fp": "f19ab6653c58e102", "name": "OI_taker_ls_30", "spec": {"factor": "taker_ls_30", "dir": 1, "src": "oi"}, "sharpe": 0.04563164545684293}
+{"fp": "7f57cab20bc6ffba", "name": "OI_oi_shock_7", "spec": {"factor": "oi_shock_7", "dir": 1, "src": "oi"}, "sharpe": 0.4034133116353168}
+{"fp": "5513bbfd099b9a14", "name": "BS_basis_7", "spec": {"factor": "basis_7", "src": "basis"}, "sharpe": 0.2767000679538879}
+{"fp": "e0332f9c66dc831f", "name": "BS_basis_z_60", "spec": {"factor": "basis_z_60", "src": "basis"}, "sharpe": 0.534420310299729}
+{"fp": "08c74c3c08b76169", "name": "BS_basis_chg", "spec": {"factor": "basis_chg", "src": "basis"}, "sharpe": -0.5832744523021801}
+{"fp": "6d075ee3497b32a7", "name": "BS_basis_resid", "spec": {"factor": "basis_resid", "src": "basis"}, "sharpe": 0.5608762903561112}
+{"fp": "e219d522850c79c5", "name": "TM_tsmom_90", "spec": {"factor": "tsmom_90", "src": "timing"}, "sharpe": 0.8001079178287057}
+{"fp": "d9b89bf192380bc1", "name": "TM_tsmom_180", "spec": {"factor": "tsmom_180", "src": "timing"}, "sharpe": 0.7853087736643688}
+{"fp": "bf3876d0edf4a0bc", "name": "TM_sma_50_200", "spec": {"factor": "sma_50_200", "src": "timing"}, "sharpe": 0.6532146450138453}
+{"fp": "15f8cb043ddcb7b7", "name": "TM_donchian_55t", "spec": {"factor": "donchian_55t", "src": "timing"}, "sharpe": 0.7441401138622838}
+{"fp": "b53ab44236567641", "name": "TM_ema_cta", "spec": {"factor": "ema_cta", "src": "timing"}, "sharpe": 0.8344803211981233}
+{"fp": "9ba61907f4d9c503", "name": "TM_vol_target_20", "spec": {"factor": "vol_target_20", "src": "timing"}, "sharpe": 0.6407167729147423}
+{"fp": "d266018bc11a9ce1", "name": "TM_dd_derisk", "spec": {"factor": "dd_derisk", "src": "timing"}, "sharpe": 0.7004898114893582}
