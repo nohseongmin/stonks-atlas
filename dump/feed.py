@@ -41,6 +41,8 @@ DUMP = "https://data.binance.vision"
 S3 = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision"
 FAPI = "https://fapi.binance.com/fapi/v1"
 PREFIX = "data/futures/um/monthly"
+#: 현물. 무기한과의 차이가 베이시스이고, 아직 안 쓴 마지막 가격 정보원이다.
+SPOT_PREFIX = "data/spot/monthly"
 CACHE = Path(__file__).resolve().parent.parent / "data"
 #: S3 ListBucket XML 네임스페이스.
 NS = "{http://s3.amazonaws.com/doc/2006-03-01/}"
@@ -285,3 +287,63 @@ def load_many(symbols: list[str], interval: str = "1d",
     if cache:
         p.write_bytes(pickle.dumps(out, protocol=5))
     return out
+
+
+def spot_months(symbol: str, interval: str = "1d") -> list[str]:
+    """현물 봉이 있는 월 목록. 무기한과 심볼명이 같다(BTCUSDT 등)."""
+    safe = urllib.parse.quote(symbol, safe="")
+    p = CACHE / "months" / f"spot_{safe}_{interval}.json"
+    if p.exists():
+        return json.loads(p.read_text(encoding="utf-8"))
+    keys, token = [], None
+    pre = f"{SPOT_PREFIX}/klines/{_q(symbol)}/{interval}/"
+    while True:
+        url = f"{S3}?list-type=2&prefix={pre}"
+        if token:
+            url += f"&continuation-token={urllib.parse.quote(token, safe='')}"
+        root = ElementTree.fromstring(_get(url))
+        for k in root.findall(f"{NS}Contents/{NS}Key"):
+            n = k.text.rsplit("/", 1)[-1]
+            if n.endswith(".zip"):
+                keys.append(n[:-4].rsplit("-", 2)[-2] + "-" + n[:-4].rsplit("-", 1)[-1])
+        token = root.findtext(f"{NS}NextContinuationToken")
+        if not token:
+            break
+    out = sorted(set(keys))
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(out), encoding="utf-8")
+    return out
+
+
+def spot_closes(symbol: str, interval: str = "1d") -> dict[int, float]:
+    """현물 종가를 `{타임스탬프: 종가}` 로. 무기한 축에 붙일 수 있게."""
+    out = {}
+    for m in spot_months(symbol, interval):
+        fn = f"{symbol}-{interval}-{m}.zip"
+        url = f"{DUMP}/{SPOT_PREFIX}/klines/{_q(symbol)}/{interval}/{_q(fn)}"
+        blob = _cached(f"spot/{urllib.parse.quote(symbol, safe='')}/{interval}/{fn}",
+                       lambda u=url: _get_or_empty(u))
+        if not blob:
+            continue
+        for r in _parse(blob):
+            out[int(r[0])] = float(r[4])
+    return out
+
+
+def warm_spot(symbols: list[str], interval: str = "1d", workers: int = 16) -> dict:
+    """현물 봉 병렬 수집. 무기한에만 있고 현물엔 없는 심볼이 많다 — 정상이다."""
+    from concurrent.futures import ThreadPoolExecutor
+    bad, none = {}, []
+
+    def one(sym):
+        try:
+            if not spot_months(sym, interval):
+                none.append(sym)
+                return
+            spot_closes(sym, interval)
+        except Exception as e:                      # noqa: BLE001
+            bad[sym] = f"{type(e).__name__}: {e}"
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        list(ex.map(one, symbols))
+    return {"asked": len(symbols), "no_spot": len(none), "failed": bad}
