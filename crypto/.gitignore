@@ -1,0 +1,19 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.log
+.DS_Store
+
+data/symbols_all.json
+data/exchange_info.json
+
+# 수집 캐시는 전부 재생성 가능하다. **원장만 예외** — 그게 증거다.
+# 예전 규칙(data/*.zip)은 직계 자식만 걸러서 data/spot/*/1d/*.zip
+# 23,000 개가 커밋됐다. 하위 전부를 걸러야 한다.
+data/**
+!data/trials.jsonl
