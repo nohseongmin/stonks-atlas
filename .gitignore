@@ -9,3 +9,8 @@ __pycache__/
 *.log
 
 !evidence/**/*.jsonl
+
+# crypto/ 는 dumpItAll 서브트리. 수집 캐시는 재생성 가능, 원장만 증거다.
+crypto/data/**
+!crypto/data/trials.jsonl
+data/us/

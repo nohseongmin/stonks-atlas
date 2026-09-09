@@ -220,14 +220,41 @@ Sharpe 1.98 이 필요한데, 외부 실증 최고가 1.04 였다.
 
 ---
 
-## 저장소 지도
+## 구조
 
 | 저장소 | 시장 | 내용 |
 |---|---|---|
-| [`dumpItAll`](https://github.com/nohseongmin/dumpItAll) | 코인 | 무기한선물 130 시행. 시점정합 하네스·관문·원장 |
-| [`STONKS-03`](https://github.com/nohseongmin/STONKS-03) | 3 시장 | 480 시행 카탈로그. 잡음바닥·실효차원 도구 |
-| [`ai-stonks-v2`](https://github.com/nohseongmin/ai-stonks-v2) | 미장 | ORB·Alpha101·일봉스윙. RiskGovernor·킬스위치 |
-| [`AI-STONKS`](https://github.com/nohseongmin/AI-STONKS) | 국장·미장 | 라이브 토스 자동매매. **실검증 1 일차 중단** |
+**이 저장소 하나가 전부다.** 나머지는 `legacy-*` 로 격리했다(내용은 그대로).
+
+```
+README.md          지금 이 문서 — 대분류 표
+markets/           시장별 상세: kr · us · crypto · live
+evidence/          사전등록·결과·원장 원본 (요약 아님)
+crypto/            코인 하네스 본체 — dumpItAll 을 이력째 편입
+verify/            딥바잉 검정기 (미장)
+PREREG_*.md        atlas 에서 새로 돌린 검정의 사전등록
+RESULTS_*.md       그 결과
+```
+
+### 코인 하네스 쓰는 법
+
+```bash
+python -m crypto.dump.costs        # 비용 산술 — 첫 관문
+python -m crypto.dump.feed         # 시점정합 유니버스 (상폐 266 포함)
+python -m crypto.dump.runzoo       # 팩터 52 개 일괄
+python -m crypto.dump.battery      # 강건성 배터리 6 종
+cd crypto && python -m pytest -q   # 88 tests
+```
+
+### 격리된 원본
+
+| 저장소 | 시장 | 내용 |
+|---|---|---|
+| [`legacy-dumpItAll`](https://github.com/nohseongmin/dumpItAll) | 코인 | `crypto/` 로 편입됨. 원본 이력 보관 |
+| [`legacy-STONKS-03`](https://github.com/nohseongmin/legacy-STONKS-03) | 3 시장 | 480 시행 카탈로그. 잡음바닥·실효차원 도구·DART 수집기 |
+| [`legacy-ai-stonks-v2`](https://github.com/nohseongmin/legacy-ai-stonks-v2) | 미장 | ORB·Alpha101·일봉스윙. RiskGovernor·킬스위치 |
+| [`legacy-AI-STONKS`](https://github.com/nohseongmin/legacy-AI-STONKS) | 국장·미장 | 라이브 토스 자동매매. **실검증 1 일차 중단** |
+| [`legacy-STONKS`](https://github.com/nohseongmin/legacy-STONKS) | 미장 | 최초 예측모델 |
 
 ---
 
