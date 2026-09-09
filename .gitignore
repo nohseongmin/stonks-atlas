@@ -20,3 +20,4 @@ data/symbols_all.json
 data/exchange_info.json
 data/*.pkl
 data/oi/
+data/legacy-stonks03/
