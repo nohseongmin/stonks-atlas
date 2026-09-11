@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STONKS ATLAS — 620 시행 검정 기록</title>
+<meta name="description" content="한국인이 돈을 넣을 수 있는 매매 도구를 620번 검정한 기록. 관문 통과 0건.">
+<meta property="og:title" content="STONKS ATLAS — 620 시행, 통과 0">
+<meta property="og:description" content="국장·미장·코인을 사전등록하고 검정한 기록. 남는 것은 전략이 아니라 전략을 죽이는 방법이다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Noto+Serif+KR:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFBFA; --surface:#FFFFFF; --line:rgba(0,0,0,.08); --line-2:rgba(0,0,0,.14);
+  --ink:#1A1A18; --ink-2:#57564F; --ink-3:#8A8880;
+  --kill:#9F2F2D; --kill-bg:#FDEBEC;
+  --mark:#1F6C9F; --mark-bg:#E7F1F8;
+  --ok:#346538; --ok-bg:#EDF3EC;
+  --serif:"Instrument Serif","Noto Serif KR",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",system-ui,"Malgun Gothic",sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#111110;--surface:#191917;--line:rgba(255,255,255,.10);--line-2:rgba(255,255,255,.18);
+    --ink:#EDEBE6;--ink-2:#A8A69E;--ink-3:#6E6C66;
+    --kill:#E8908C;--kill-bg:#2A1817;--mark:#7EB8DE;--mark-bg:#14222C;--ok:#8FBF93;--ok-bg:#162117;}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.65;letter-spacing:-.005em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.02em;line-height:1.12;margin:0}
+a{color:inherit}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+header{border-bottom:1px solid var(--line);padding:88px 0 0}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:22px}
+h1{font-size:clamp(34px,5.6vw,68px);max-width:15em;word-break:keep-all}
+h1 em{font-style:italic}
+.lede{margin:26px 0 0;max-width:40em;font-size:17px;color:var(--ink-2);word-break:keep-all}
+.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border-top:1px solid var(--line);margin-top:56px}
+.score{background:var(--bg);padding:26px 20px 30px}
+.score b{display:block;font-family:var(--mono);font-size:clamp(30px,4.6vw,44px);
+  font-weight:500;line-height:1;letter-spacing:-.04em}
+.score span{display:block;margin-top:9px;font-size:12px;color:var(--ink-3);letter-spacing:.01em}
+.score.zero b{color:var(--kill)}
+section{padding:72px 0;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:16px}
+h2{font-size:clamp(24px,3.2vw,34px);max-width:20em;word-break:keep-all}
+.sub{margin:16px 0 0;max-width:44em;color:var(--ink-2);word-break:keep-all}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start;margin-top:40px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:40px}
+.cell{background:var(--bg);padding:24px}
+.cell h3{font-size:19px;margin-bottom:6px}
+.cell .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+table{width:100%;border-collapse:collapse;margin-top:28px;font-size:14px}
+th{text-align:left;font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);padding:0 12px 10px 0;border-bottom:1px solid var(--line-2)}
+td{padding:11px 12px 11px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap;padding-right:0}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:3px;
+  letter-spacing:.02em;white-space:nowrap}
+.t-kill{background:var(--kill-bg);color:var(--kill)}
+.t-ok{background:var(--ok-bg);color:var(--ok)}
+.t-mark{background:var(--mark-bg);color:var(--mark)}
+.pull{font-family:var(--serif);font-size:clamp(20px,2.6vw,28px);line-height:1.32;
+  max-width:18em;margin:0;letter-spacing:-.015em;word-break:keep-all}
+.pull em{font-style:italic;color:var(--kill)}
+figure{margin:36px 0 0}
+figcaption{margin-top:14px;font-size:12.5px;color:var(--ink-3);max-width:44em;word-break:keep-all}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.axis{font-family:var(--mono);font-size:10px;fill:var(--ink-3)}
+.gl{stroke:var(--line);stroke-width:1}
+.note{margin-top:34px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);
+  border-left:2px solid var(--kill)}
+.note p{margin:0;font-size:14px;color:var(--ink-2)}
+.note strong{color:var(--ink)}
+code{font-family:var(--mono);font-size:.9em;background:var(--surface);
+  border:1px solid var(--line);padding:1px 5px;border-radius:3px}
+footer{padding:64px 0 88px;color:var(--ink-3);font-size:13px}
+footer a{text-decoration:none;border-bottom:1px solid var(--line-2);padding-bottom:1px}
+footer a:hover{color:var(--ink)}
+.foot-grid{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+@media(max-width:820px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .scores{grid-template-columns:1fr 1fr}
+  .foot-grid{grid-template-columns:1fr}
+  header{padding-top:56px}
+  section{padding:52px 0}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">2026 · 국장 · 미장 · 코인 · 라이브</div>
+    <h1>620 번 검정했고 <em>하나도 살아남지 못했다</em></h1>
+    <p class="lede">한국인이 실제로 돈을 넣을 수 있는 매매 도구를 하나씩 사전등록하고 검정한 기록.
+      남는 것은 전략이 아니라 전략을 죽이는 방법과 그 사망 진단서다.</p>
+    <div class="scores">
+      <div class="score"><b class="num">620</b><span>누적 시행</span></div>
+      <div class="score zero"><b class="num">0</b><span>관문 통과</span></div>
+      <div class="score zero"><b class="num">0</b><span>강건성 배터리 완주</span></div>
+      <div class="score zero"><b class="num">0</b><span>매수보유를 이긴 신호</span></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">발견 01</div>
+    <h2>카탈로그를 늘릴수록 통과선이 스스로 올라간다</h2>
+    <p class="sub">참 실력이 0이어도 n번 뒤지면 우연히 나오는 최고 Sharpe가 있다.
+      시행이 쌓이면 그 값이 오르고, 그게 곧 통과선이다. 전략을 더 찾는 행위가 남은 후보를 죽인다.</p>
+
+    <figure>
+      <svg viewBox="0 0 720 300" role="img" aria-label="시행 수에 따른 잡음바닥 상승과 관측 최고의 정체">
+        <line class="gl" x1="56" y1="20" x2="700" y2="20"/>
+        <line class="gl" x1="56" y1="90" x2="700" y2="90"/>
+        <line class="gl" x1="56" y1="160" x2="700" y2="160"/>
+        <line class="gl" x1="56" y1="230" x2="700" y2="230"/>
+        <text class="axis" x="48" y="24" text-anchor="end">2.0</text>
+        <text class="axis" x="48" y="94" text-anchor="end">1.7</text>
+        <text class="axis" x="48" y="164" text-anchor="end">1.4</text>
+        <text class="axis" x="48" y="234" text-anchor="end">1.1</text>
+        <polyline fill="none" stroke="var(--kill)" stroke-width="2.5"
+          points="70,218 196,125 322,67 448,46 574,39 690,30"/>
+        <polyline fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-dasharray="5 4"
+          points="70,239 196,239 322,125 448,125 574,125 690,125"/>
+        <g fill="var(--kill)"><circle cx="70" cy="218" r="3.5"/><circle cx="196" cy="125" r="3.5"/>
+          <circle cx="322" cy="67" r="3.5"/><circle cx="448" cy="46" r="3.5"/>
+          <circle cx="574" cy="39" r="3.5"/><circle cx="690" cy="30" r="4.5"/></g>
+        <text class="axis" x="686" y="16" text-anchor="end" fill="var(--kill)">통과선 1.98</text>
+        <text class="axis" x="686" y="142" text-anchor="end">관측 최고 1.55</text>
+        <g class="axis" text-anchor="middle">
+          <text x="70" y="266">5</text><text x="196" y="266">34</text><text x="322" y="266">54</text>
+          <text x="448" y="266">109</text><text x="574" y="266">119</text><text x="690" y="266">130</text>
+          <text x="380" y="292">누적 시행 수 — 코인 원장</text>
+        </g>
+      </svg>
+      <figcaption>실선 = 참 실력 0일 때 우연히 나올 최고 Sharpe(통과선). 점선 = 그 시점 실제 관측 최고.
+        <strong>54시행 이후 격차가 계속 벌어진다.</strong></figcaption>
+    </figure>
+
+    <div class="note"><p>130시행 시점에서 통과하려면 Sharpe <strong class="num">1.98</strong>이 필요하다.
+      정직하게 처리한 <strong>외부 실증 최고가 <span class="num">1.04</span></strong>였다.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">발견 02</div>
+    <h2>차원이 애초에 두세 개뿐이다</h2>
+    <p class="sub">전략 수와 독립 정보량은 다르다. 상관행렬의 참여비로 재면
+      수십 개 전략이 몇 개의 베팅으로 압축된다. 자체 측정과 외부 문헌이 독립적으로 같은 곳을 가리킨다.</p>
+
+    <figure>
+      <svg viewBox="0 0 720 250" role="img" aria-label="전략 수 대비 실효 독립 차원">
+        <g class="axis">
+          <text x="0" y="34">한국 25 모델</text>
+          <text x="0" y="76">코인 정보원 5종</text>
+          <text x="0" y="118">미국 25 모델</text>
+          <text x="0" y="160">CTA 268 시장 · 외부</text>
+          <text x="0" y="202">코인 62 전략</text>
+        </g>
+        <rect x="180" y="20" width="65" height="20" fill="var(--kill)" opacity=".85"/>
+        <rect x="180" y="62" width="130" height="20" fill="var(--kill)" opacity=".7"/>
+        <rect x="180" y="104" width="148" height="20" fill="var(--kill)" opacity=".7"/>
+        <rect x="180" y="146" width="176" height="20" fill="var(--ink-3)" opacity=".55"/>
+        <rect x="180" y="188" width="379" height="20" fill="var(--mark)" opacity=".7"/>
+        <g class="axis" fill="var(--ink-2)">
+          <text x="255" y="34">1.4</text><text x="320" y="76">2.81</text>
+          <text x="338" y="118">3.2</text><text x="366" y="160">3.81</text>
+          <text x="569" y="202">8.2</text>
+        </g>
+        <line class="gl" x1="180" y1="216" x2="660" y2="216"/>
+        <text class="axis" x="180" y="234">0</text><text class="axis" x="420" y="234">5</text>
+        <text class="axis" x="660" y="234">10 — 실효 독립 차원</text>
+      </svg>
+      <figcaption>외부 참고: <em>Correlation Without Factors</em>가 유동 크립토 유니버스의 자유도를
+        1.85로, <code>OctopusTakopi</code>가 268시장 CTA의 실효 폭을 3.81로 보고한다.</figcaption>
+    </figure>
+
+    <p class="pull" style="margin-top:40px">두세 차원 공간에서 <em>620개의 서로 다른 엣지를 찾을 수 없다.</em>
+      같은 한두 개를 계속 다시 검정한 것이다.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">시장별</div>
+    <h2>어디서 어떻게 죽었나</h2>
+    <div class="grid3">
+      <div class="cell">
+        <div class="meta">국장 · 14 시행</div>
+        <h3>레버리지가 없다</h3>
+        <p class="sub" style="margin-top:10px;font-size:14px">최고 <span class="num">0.798</span>인데
+          우연 기대가 <span class="num">0.826</span>이다. 25모델이 <span class="num">1.4</span>차원.
+          토스가 상폐 캔들을 안 줘서 <strong>시점정합이 구조적으로 불가능</strong>하다.</p>
+        <table><tbody>
+          <tr><td>KR_XS_하방편차</td><td class="n">0.78</td><td class="n"><span class="tag t-kill">2015년 소멸</span></td></tr>
+          <tr><td>한국 PEAD · DART</td><td class="n">0.525</td><td class="n"><span class="tag t-kill">벤치 0.728</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="cell">
+        <div class="meta">미장 · 467 시행</div>
+        <h3>회전율이 전부 먹는다</h3>
+        <p class="sub" style="margin-top:10px;font-size:14px">급등주 ORB가 가짜 엣지 5겹을 벗기니
+          <strong class="num" style="color:var(--kill)">−22.2bp</strong>(t <span class="num">−15.96</span>).
+          Alpha101 34개는 DSR <span class="num">0.647</span>로 전부 기각.</p>
+        <table><tbody>
+          <tr><td>생존편향 포함</td><td class="n">+62.6bp</td><td class="n"><span class="tag t-mark">착시</span></td></tr>
+          <tr><td>룩어헤드 포함</td><td class="n">+14.0bp</td><td class="n"><span class="tag t-mark">착시</span></td></tr>
+          <tr><td>정직한 구성</td><td class="n">−22.2bp</td><td class="n"><span class="tag t-kill">진실</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="cell">
+        <div class="meta">코인 · 130 시행</div>
+        <h3>10 종목이 만들었다</h3>
+        <p class="sub" style="margin-top:10px;font-size:14px">주문흐름이 관문 <span class="num">6/7</span>을
+          통과했다. 그런데 753종목 중 <strong>10개를 빼면 절반으로 떨어진다</strong> — 그 안에 LUNA가 있다.</p>
+        <table><tbody>
+          <tr><td>taker_imb_30</td><td class="n">1.55</td><td class="n"><span class="tag t-ok">6/7 통과</span></td></tr>
+          <tr><td>상위 10종목 제외</td><td class="n">0.95</td><td class="n"><span class="tag t-kill">기각</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="note" style="border-left-color:var(--mark)">
+      <p><strong>라이브는 별개 문제였다.</strong> 토스 API를 전부 연결하고 8주 실검증을 사전등록까지 했는데,
+      저널에 <strong class="num">1일치</strong>만 남아 있다. 약 40거래일 중 1일 —
+      가동률 <strong class="num">2.5%</strong>. 사전등록 기준 하나가 95%였다.
+      <strong>연구는 620시행, 배포는 1일.</strong> 엣지를 못 찾은 것과 별개로 찾았어도 운영되지 않았다.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">발견 03</div>
+    <h2>크립토는 주식 문헌의 부호가 거꾸로 돈다</h2>
+    <p class="sub">여섯 쌍 전부 사전등록된 부호 그대로 기록했다. 한 번도 결과를 보고 뒤집지 않았다 —
+      뒤집었어도 최고가 <span class="num">+1.27</span>로 잡음바닥을 못 넘는다.</p>
+    <table>
+      <thead><tr><th>주식 문헌</th><th>크립토 실측</th><th class="n">뒤집었을 때</th></tr></thead>
+      <tbody>
+        <tr><td>저변동성 우위</td><td>고변동성이 이긴다</td><td class="n">+0.53</td></tr>
+        <tr><td>복권주 회피 · MAX</td><td>복권주가 이긴다</td><td class="n">+0.72</td></tr>
+        <tr><td>단기 반전</td><td>연속성이 이긴다</td><td class="n">+0.68</td></tr>
+        <tr><td>상위 트레이더 추종</td><td>반대로 가야 번다</td><td class="n">+1.27</td></tr>
+        <tr><td>베이시스 모멘텀</td><td>되돌린다</td><td class="n">+0.58</td></tr>
+        <tr><td>변동성 관리 · Moreira-Muir</td><td>수익을 같이 자른다</td><td class="n">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">산술</div>
+    <h2>레버리지로는 상한을 못 넘는다</h2>
+    <div class="grid2">
+      <div>
+        <p class="sub" style="margin-top:0">기하수익은 <code>CAGR − rf = S·σ − σ²/2</code>이고
+          <code>σ = S</code>에서 최대다. 그 값이 <code>rf + S²/2</code> — 레버리지는 Sharpe를 못 바꾸므로
+          이게 최종 상한이다.</p>
+        <table>
+          <thead><tr><th>관측 Sharpe</th><th class="n">절반켈리 월</th><th class="n">3,000만원 기준</th></tr></thead>
+          <tbody>
+            <tr><td>1.06 코인 조합</td><td class="n">3.21%</td><td class="n">96만원</td></tr>
+            <tr><td>0.90 BTC 매수보유</td><td class="n">2.49%</td><td class="n">75만원</td></tr>
+            <tr><td>0.50 보수적 가정</td><td class="n">1.05%</td><td class="n">32만원</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <p class="pull">월 5%에 필요한 Sharpe는 <em>1.42</em>. 620시행 최고가 1.55였고 배터리에서 죽었다.</p>
+        <div class="note" style="margin-top:26px">
+          <p>그 숫자도 <strong>반토막 확률 12.5%</strong>를 받아들여야 나온다.
+            완전켈리면 <strong class="num">50%</strong>다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">방법론</div>
+    <h2>이 결과를 믿을 수 있는 이유</h2>
+    <div class="grid2">
+      <div>
+        <table>
+          <thead><tr><th>방어</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>사전등록</td><td>결과 보기 전에 규칙·예상·반증조건을 커밋. 9건</td></tr>
+            <tr><td>관문 7종</td><td>하나라도 실패하면 기각. fail-closed</td></tr>
+            <tr><td>원장</td><td>기각도 전부 기록. 안 하면 벌점이 거짓말이 된다</td></tr>
+            <tr><td>강건성 배터리</td><td>죽일 수만 있고 승격은 못 시킨다</td></tr>
+            <tr><td>관문 검정력 시험</td><td>진짜 좋은 전략을 통과시키는지 확인</td></tr>
+            <tr><td>룩어헤드 봉인</td><td>미래 인덱스 접근에 <code>IndexError</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <p class="sub" style="margin-top:0"><strong>자책 버그 6개를 잡았는데, 관문이 잡은 건 0개다.</strong>
+          테스트와 물리적 제약이 잡았다.</p>
+        <table><tbody>
+            <tr><td>ctx에 미래가 샘</td><td>SPY와 상관 <span class="num">1.0000</span>이 이상해서</td></tr>
+            <tr><td>횡단면 가동률 54%</td><td>부호 연속 <span class="num">2,358일</span>이 불가능해서</td></tr>
+            <tr><td>봉 사이 갭 소실</td><td>심어둔 신호를 테스트가 복원 못 해서</td></tr>
+            <tr><td>PastView 길이 오보</td><td>거래대금 0 종목이 필터를 통과할 뻔</td></tr>
+            <tr><td>OI 파서 배열 어긋남</td><td><span class="num">354</span> 심볼이 죽어서</td></tr>
+            <tr><td>한자 심볼 미인코딩</td><td>유니버스 스캔이 멈춰서</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <p style="margin:0 0 8px"><strong style="color:var(--ink)">STONKS ATLAS</strong> —
+        사전등록 9건 · 관문 7종 · 원장 130시행 · 테스트 88개</p>
+      <p style="margin:0">시장 안(가격·펀딩·주문흐름·포지션·베이시스)도 시장 밖(공시 재무제표)도 없었다.
+        무료로 얻을 수 있는 정보원을 전부 열었다.</p>
+    </div>
+    <div style="white-space:nowrap">
+      <a href="https://github.com/nohseongmin/stonks-atlas">저장소</a> ·
+      <a href="https://github.com/nohseongmin/stonks-atlas/tree/main/evidence">증거 원본</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
