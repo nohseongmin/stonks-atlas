@@ -16,6 +16,8 @@
 
 *남는 것은 전략이 아니라 **전략을 죽이는 방법**과 그 사망 진단서다.*
 
+**[→ 결과 사이트 nohseongmin.github.io/stonks-atlas](https://nohseongmin.github.io/stonks-atlas/)**
+
 </div>
 
 ---
