@@ -67,8 +67,8 @@ def main(argv: list[str] | None = None) -> int:
     for n in (7, 14, 30, 60, 90):
         sr, bsr, ok, _ = score(bars, xs_rule(taker_factor(n), at), BINANCE_USDM,
                                f"창 {n}일")
-        plateau[n] = sr
-    neigh = [plateau[n] - 0.90 >= CFG.min_margin_vs_bench for n in (14, 60)]
+        plateau[n] = ok
+    neigh = [plateau[n] for n in (14, 60)]
     if not all(neigh):
         fails.append("1 고원 — 30 의 이웃(14·60)이 통과선을 못 넘었다")
 
