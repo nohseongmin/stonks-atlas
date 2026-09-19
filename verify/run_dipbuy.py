@@ -40,14 +40,22 @@ def main(argv=None) -> int:
         fails.append(f"1·2 노출조정 제거 — {sum(wins)}/{len(wins)} 만 보유를 넘음")
 
     print("\n3) 파라미터 고원 — SPY·QQQ 평균 여유폭")
+    neigh = []
     for gw, gd in GRID:
         m = []
         for s in ("SPY", "QQQ"):
             if s in data:
                 c = data[s]
                 m.append(stats(run(c, gw, gd))["sharpe"] - stats(hold(c, gw))["sharpe"])
-        mark = "  <- 원 값" if (gw, gd) == BASE else ""
-        print(f"  ({gw:>2}, {gd:.0f}%)      여유 {st.fmean(m):+.2f}{mark}")
+        margin = st.fmean(m)
+        is_base = (gw, gd) == BASE
+        ok = margin > 0
+        if not is_base:
+            neigh.append(ok)
+        mark = "  <- 원 값" if is_base else f"   {'OK' if ok else '**NG**'}"
+        print(f"  ({gw:>2}, {gd:.0f}%)      여유 {margin:+.2f}{mark}")
+    if not all(neigh):
+        fails.append("3 고원 — 이웃 파라미터에서 여유가 무너졌다")
 
     print("\n4) 하위표본 — SPY 전반/후반")
     c = data["SPY"]
