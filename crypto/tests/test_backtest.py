@@ -34,6 +34,15 @@ def test_pastview_slice_cannot_escape():
     assert v[2:99] == [2, 3]
 
 
+@pytest.mark.parametrize("end", [-1, 0, 3, 9, 59])
+@pytest.mark.parametrize("key", [slice(None, None, -1), slice(None, None, -2),
+                                 slice(99, None, -1), slice(2, 0, -1),
+                                 slice(None, -1, -1)])
+def test_pastview_reverse_slice_matches_visible_list(end, key):
+    values = list(range(10))
+    assert PastView(values, end)[key] == values[:end + 1][key]
+
+
 def test_rule_reading_future_raises():
     """**규칙이 미래를 만지면 조용히 새지 않고 터진다.**"""
     def cheat(t, past):
