@@ -44,7 +44,7 @@ class PastView:
     def __getitem__(self, k):
         if isinstance(k, slice):
             start, stop, step = k.indices(self._n)
-            return self._l[start:stop:step]
+            return [self._l[i] for i in range(start, stop, step)]
         i = k + self._n if k < 0 else k
         if not 0 <= i < self._n:
             raise IndexError(f"미래 참조 차단: {k} (가용 0..{self._n - 1})")
