@@ -57,6 +57,12 @@ def test_cached_writes_once(tmp_path, monkeypatch):
     assert len(calls) == 1
 
 
+def test_funding_skips_cached_missing_file(monkeypatch):
+    """사전 수집기가 404를 빈 바이트로 캐시한다. 적재할 때 ZIP으로 열면 안 된다."""
+    monkeypatch.setattr(feed, "_cached", lambda name, fetch: b"")
+    assert feed.funding("X", ["2024-01"]) == []
+
+
 def test_universe_at_uses_file_presence(monkeypatch):
     """**상폐된 심볼이 그 시점 유니버스에 들어가야 한다.** 이게 PIT 의 전부다."""
     monkeypatch.setattr(feed, "all_symbols", lambda: ["ALIVE", "DEAD"])
