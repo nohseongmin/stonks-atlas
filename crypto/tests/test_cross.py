@@ -122,6 +122,11 @@ def test_rebalance_must_be_positive():
         run_cross_section(book(), lambda t, p, l: {}, V, rebalance=0)
 
 
+def test_capital_must_be_positive():
+    with pytest.raises(ValueError, match="자본은 양수"):
+        run_cross_section(book(), lambda t, p, l: {}, V, capital=0)
+
+
 # ---------------------------------------------------------------- 수익·펀딩
 
 def test_long_captures_the_move():
