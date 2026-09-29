@@ -267,6 +267,8 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
     n = len(axis)
     if n < 2:
         raise ValueError(f"축이 {n} 개다. 최소 2 개 필요")
+    if capital <= 0:
+        raise ValueError(f"자본은 양수여야 한다: {capital}")
     if rebalance < 1:
         raise ValueError(f"리밸런싱 간격은 1 이상이어야 한다: {rebalance}")
 
