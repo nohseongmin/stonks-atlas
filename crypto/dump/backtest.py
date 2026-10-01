@@ -19,6 +19,7 @@
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 from .costs import Venue
@@ -153,6 +154,8 @@ def run(bars: Bars, rule, venue: Venue, capital: float = 100.0,
         if want is None:
             want = pos
         want = float(want)
+        if not math.isfinite(want):
+            raise ValueError(f"t={t}: 유한하지 않은 목표 레버리지 — {want}")
         if abs(want) > venue.max_leverage:
             raise ValueError(f"t={t}: 목표 {want} 가 최대 레버리지 "
                              f"{venue.max_leverage} 를 넘는다")
@@ -305,6 +308,9 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
             want = rule(t, past, live)
             if want is not None:
                 want = {s: float(w) for s, w in want.items() if w}
+                invalid = {s: w for s, w in want.items() if not math.isfinite(w)}
+                if invalid:
+                    raise ValueError(f"t={t}: 유한하지 않은 가중치 — {invalid}")
                 gross = sum(abs(w) for w in want.values())
                 if gross > venue.max_leverage:
                     raise ValueError(f"t={t}: 총 레버리지 {gross:.1f} 가 최대 "
