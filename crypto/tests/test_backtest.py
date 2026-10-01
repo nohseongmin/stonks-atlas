@@ -117,6 +117,11 @@ def test_leverage_over_max_rejected():
         run(flat(5), lambda t, p: 999.0, V)
 
 
+def test_nonfinite_leverage_rejected():
+    with pytest.raises(ValueError, match="유한하지 않은 목표 레버리지"):
+        run(flat(5), lambda t, p: float("nan"), V)
+
+
 # ---------------------------------------------------------------- 펀딩
 
 FREE = Venue("free", 0, 0, 0, 0, 125, 0)

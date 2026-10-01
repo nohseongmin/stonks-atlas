@@ -112,6 +112,11 @@ def test_gross_leverage_cap_enforced():
                           V, rebalance=1)
 
 
+def test_nonfinite_weight_rejected():
+    with pytest.raises(ValueError, match="유한하지 않은 가중치"):
+        run_cross_section(book(), lambda t, p, l: {"A": float("nan")}, V)
+
+
 def test_rebalance_interval_respected():
     log = seen(book(), rebalance=3)
     assert sorted(log) == [0, 3, 6]
