@@ -57,6 +57,32 @@ def test_cached_writes_once(tmp_path, monkeypatch):
     assert len(calls) == 1
 
 
+@pytest.mark.parametrize("first, second", [
+    (["BTCUSDT"], ["BTCUSDT", "ETHUSDT"]),
+    (["BTCUSDT", "ETHUSDT"], ["BTCUSDT"]),
+    (["BTCUSDT", "ETHUSDT"], ["ETHUSDT", "BTCUSDT"]),
+    (["BTCUSDT"], []),
+    ([], ["币安人生USDT"]),
+])
+def test_load_many_cache_tracks_requested_symbols(first, second, tmp_path, monkeypatch):
+    """다른 유니버스가 섞이면 안 되고, 같은 요청은 다시 적재하지 않아야 한다."""
+    monkeypatch.setattr(feed, "CACHE", tmp_path)
+    bars = {s: feed.Bars(s, [0, 1], [1, 1], [1, 1], [1, 1], [1, 1])
+            for s in set(first + second)}
+    calls = []
+
+    def load(symbol, interval):
+        calls.append(symbol)
+        return bars[symbol]
+
+    monkeypatch.setattr(feed, "load", load)
+    for symbols in (first, second, first, second):
+        result = feed.load_many(symbols, min_bars=2)
+        assert list(result) == symbols
+        assert result == {s: bars[s] for s in symbols}
+    assert calls == first + second
+
+
 def test_funding_skips_cached_missing_file(monkeypatch):
     """사전 수집기가 404를 빈 바이트로 캐시한다. 적재할 때 ZIP으로 열면 안 된다."""
     monkeypatch.setattr(feed, "_cached", lambda name, fetch: b"")

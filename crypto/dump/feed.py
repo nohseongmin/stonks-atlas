@@ -25,6 +25,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import json
 import urllib.error
@@ -276,7 +277,10 @@ def load_many(symbols: list[str], interval: str = "1d",
     반환값에 안 넣고 끝내지 말고 로그로 남길 것.
     """
     import pickle
-    p = CACHE / f"bars_{interval}_{min_bars}.pkl"
+    # 단일 자산과 횡단면 캐시가 섞이지 않게 요청 목록의 순서까지 구분한다.
+    blob = json.dumps(symbols, ensure_ascii=False)
+    fp = hashlib.sha256(blob.encode("utf-8")).hexdigest()
+    p = CACHE / f"bars_{interval}_{min_bars}_{fp}.pkl"
     if cache and p.exists():
         return pickle.loads(p.read_bytes())
     out = {}
