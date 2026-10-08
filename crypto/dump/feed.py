@@ -183,7 +183,7 @@ def load(symbol: str, interval: str = "1d",
     for m in sorted(use):
         fn = f"{symbol}-{interval}-{m}.zip"
         url = f"{DUMP}/{PREFIX}/klines/{_q(symbol)}/{interval}/{_q(fn)}"
-        for r in _parse(_cached(f"klines/{symbol}/{interval}/{fn}",
+        for r in _parse(_cached(f"klines/{urllib.parse.quote(symbol, safe='')}/{interval}/{fn}",
                                 lambda u=url: _get(u))):
             ts.append(int(r[0]))
             op.append(float(r[1]))

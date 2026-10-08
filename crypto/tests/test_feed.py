@@ -57,6 +57,22 @@ def test_cached_writes_once(tmp_path, monkeypatch):
     assert len(calls) == 1
 
 
+@pytest.mark.parametrize("symbol", ["BTCUSDT", "币安人生USDT"])
+def test_load_reuses_warm_cache(symbol, tmp_path, monkeypatch):
+    """한자 심볼도 사전 수집한 봉을 다시 내려받지 않아야 한다."""
+    monkeypatch.setattr(feed, "CACHE", tmp_path)
+    monkeypatch.setattr(feed, "months", lambda s, i="1d": ["2022-01"])
+    blob = _zip(f"{HEADER}\n{ROW1}\n{ROW2}\n")
+    monkeypatch.setattr(feed, "_get", lambda url: blob)
+    monkeypatch.setattr(feed, "_get_or_empty", lambda url: b"")
+    assert feed.warm([symbol], workers=1) == {"asked": 1, "failed": {}}
+
+    monkeypatch.setattr(feed, "_get", lambda url: pytest.fail("캐시된 봉을 다시 요청했다"))
+    bars = feed.load(symbol)
+    assert bars.ts == [1640995200000, 1640995260000]
+    assert bars.close == [100.5, 101.5]
+
+
 @pytest.mark.parametrize("first, second", [
     (["BTCUSDT"], ["BTCUSDT", "ETHUSDT"]),
     (["BTCUSDT", "ETHUSDT"], ["BTCUSDT"]),
