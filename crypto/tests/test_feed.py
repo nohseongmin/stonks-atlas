@@ -115,6 +115,15 @@ def test_universe_at_uses_file_presence(monkeypatch):
     assert feed.universe_at(date(2026, 8, 1)) == ["ALIVE"]
 
 
+@pytest.mark.parametrize("symbols", [[], ["DEAD"]])
+def test_universe_at_respects_requested_symbols(symbols, monkeypatch):
+    """빈 목록도 명시한 유니버스다. 전체 심볼로 대체하면 안 된다."""
+    monkeypatch.setattr(feed, "all_symbols", lambda: pytest.fail("전체 심볼을 요청했다"))
+    monkeypatch.setattr(feed, "months", lambda s, i="1d": ["2022-06"])
+    from datetime import date
+    assert feed.universe_at(date(2022, 6, 1), symbols=symbols) == symbols
+
+
 def test_load_rejects_unavailable_months(monkeypatch):
     monkeypatch.setattr(feed, "months", lambda s, i="1d": ["2022-06"])
     with pytest.raises(ValueError, match="받을 월이 없다"):

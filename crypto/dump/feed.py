@@ -153,7 +153,8 @@ def universe_at(when: date, interval: str = "1d",
     판정은 "그 달의 봉 파일이 있느냐"다. 파일이 있으면 그때 살아 있었다.
     """
     tag = f"{when.year:04d}-{when.month:02d}"
-    return [s for s in (symbols or all_symbols()) if tag in months(s, interval)]
+    return [s for s in (all_symbols() if symbols is None else symbols)
+            if tag in months(s, interval)]
 
 
 def _parse(blob: bytes) -> list[list[str]]:
