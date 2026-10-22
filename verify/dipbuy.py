@@ -66,12 +66,12 @@ def run(closes: list[float], window: int, dip: float, cost_bps: float = COST_BPS
         px = closes[i]
         want = 1 if (pos == 0 and px <= m * (1 - dip / 100)) else \
                (0 if (pos > 0 and px >= m) else pos)
-        if want != pos:
-            eq *= 1 - half            # 편도 비용
-            pos = want
         r = closes[i + 1] / closes[i] - 1 if closes[i] > 0 else 0.0
         eq *= (1 + r) if pos else (1 + daily_rf)
         days_in += pos
+        if want != pos:
+            eq *= 1 - half            # 편도 비용
+            pos = want
         curve.append(eq)
     n = len(curve) - 1
     return {"curve": curve, "n": n,
