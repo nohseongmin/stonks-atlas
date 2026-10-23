@@ -202,14 +202,9 @@ def funding(symbol: str, want: list[str] | None = None) -> list[tuple[int, float
     for m in sorted(want or []):
         fn = f"{symbol}-fundingRate-{m}.zip"
         url = f"{DUMP}/{PREFIX}/fundingRate/{_q(symbol)}/{_q(fn)}"
-        try:
-            blob = _cached(
-                f"funding/{urllib.parse.quote(symbol, safe='')}/{fn}",
-                lambda u=url: _get(u))
-        except urllib.error.HTTPError as e:
-            if e.code != 404:
-                raise
-            continue
+        blob = _cached(
+            f"funding/{urllib.parse.quote(symbol, safe='')}/{fn}",
+            lambda u=url: _get_or_empty(u))
         if not blob:
             continue
         rows = _parse(blob)
