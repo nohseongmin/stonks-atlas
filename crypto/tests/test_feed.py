@@ -1,5 +1,6 @@
 """수집기 검정. **네트워크를 안 탄다** — 파싱과 캐시 규칙만 본다."""
 import io
+import urllib.error
 import zipfile
 
 import pytest
@@ -103,6 +104,39 @@ def test_funding_skips_cached_missing_file(monkeypatch):
     """사전 수집기가 404를 빈 바이트로 캐시한다. 적재할 때 ZIP으로 열면 안 된다."""
     monkeypatch.setattr(feed, "_cached", lambda name, fetch: b"")
     assert feed.funding("X", ["2024-01"]) == []
+
+
+def test_funding_caches_missing_file(tmp_path, monkeypatch):
+    """직접 적재할 때도 없는 펀딩 파일을 다시 요청하면 안 된다."""
+    monkeypatch.setattr(feed, "CACHE", tmp_path)
+    calls = []
+
+    def fetch(url):
+        calls.append(url)
+        raise urllib.error.HTTPError(url, 404, "Not Found", None, None)
+
+    monkeypatch.setattr(feed, "_get", fetch)
+    assert feed.funding("X", ["2024-01"]) == []
+    assert feed.funding("X", ["2024-01"]) == []
+    assert len(calls) == 1
+
+
+@pytest.mark.parametrize("code", [403, 429, 500])
+def test_funding_does_not_cache_other_http_errors(code, tmp_path, monkeypatch):
+    """접근 제한이나 서버 오류를 파일 부재로 캐시하면 안 된다."""
+    monkeypatch.setattr(feed, "CACHE", tmp_path)
+    calls = []
+
+    def fetch(url):
+        calls.append(url)
+        raise urllib.error.HTTPError(url, code, "HTTP error", None, None)
+
+    monkeypatch.setattr(feed, "_get", fetch)
+    for _ in range(2):
+        with pytest.raises(urllib.error.HTTPError) as exc:
+            feed.funding("X", ["2024-01"])
+        assert exc.value.code == code
+    assert len(calls) == 2
 
 
 def test_universe_at_uses_file_presence(monkeypatch):
