@@ -175,9 +175,9 @@ def _parse(blob: bytes) -> list[list[str]]:
 
 def load(symbol: str, interval: str = "1d",
          want: list[str] | None = None) -> Bars:
-    """봉을 받아 `Bars` 로 만든다. `want` 는 `YYYY-MM` 목록, 없으면 전 기간."""
+    """봉을 받아 `Bars` 로 만든다. `want` 는 `YYYY-MM` 목록, `None` 이면 전 기간."""
     have = months(symbol, interval)
-    use = [m for m in (want or have) if m in have]
+    use = [m for m in (have if want is None else want) if m in have]
     if not use:
         raise ValueError(f"{symbol} {interval}: 받을 월이 없다 (가용 {len(have)} 개)")
     ts, op, hi, lo, cl, qv, tb = [], [], [], [], [], [], []

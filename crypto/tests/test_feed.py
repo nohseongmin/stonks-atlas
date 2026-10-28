@@ -158,10 +158,13 @@ def test_universe_at_respects_requested_symbols(symbols, monkeypatch):
     assert feed.universe_at(date(2022, 6, 1), symbols=symbols) == symbols
 
 
-def test_load_rejects_unavailable_months(monkeypatch):
+@pytest.mark.parametrize("want", [[], ["2019-01"]])
+def test_load_rejects_unavailable_months(want, monkeypatch):
     monkeypatch.setattr(feed, "months", lambda s, i="1d": ["2022-06"])
+    monkeypatch.setattr(feed, "_cached", lambda name, fetch:
+                        pytest.fail("요청하지 않은 월을 적재했다"))
     with pytest.raises(ValueError, match="받을 월이 없다"):
-        feed.load("X", "1d", ["2019-01"])
+        feed.load("X", "1d", want)
 
 
 def test_non_ascii_symbols_are_encoded_not_dropped():
