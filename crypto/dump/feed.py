@@ -280,14 +280,16 @@ def load_many(symbols: list[str], interval: str = "1d",
     if cache and p.exists():
         return pickle.loads(p.read_bytes())
     out = {}
+    is_complete = True
     for s in symbols:
         try:
             b = load(s, interval)
         except Exception:                           # noqa: BLE001
+            is_complete = False
             continue
         if len(b) >= min_bars:
             out[s] = b
-    if cache:
+    if cache and is_complete:
         p.write_bytes(pickle.dumps(out, protocol=5))
     return out
 

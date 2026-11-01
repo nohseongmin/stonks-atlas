@@ -100,6 +100,29 @@ def test_load_many_cache_tracks_requested_symbols(first, second, tmp_path, monke
     assert calls == first + second
 
 
+@pytest.mark.parametrize("symbols", [["ETHUSDT"], ["BTCUSDT", "ETHUSDT"]])
+def test_load_many_retries_failed_load_before_caching(symbols, tmp_path, monkeypatch):
+    """일시 실패로 빠진 심볼이 캐시 때문에 다음 실행에서도 빠지면 안 된다."""
+    monkeypatch.setattr(feed, "CACHE", tmp_path)
+    bars = {s: feed.Bars(s, [0, 1], [1, 1], [1, 1], [1, 1], [1, 1])
+            for s in symbols}
+    calls = []
+
+    def load(symbol, interval):
+        calls.append(symbol)
+        if symbol == "ETHUSDT" and calls.count(symbol) == 1:
+            raise TimeoutError("일시적인 적재 실패")
+        return bars[symbol]
+
+    monkeypatch.setattr(feed, "load", load)
+    assert feed.load_many(symbols, min_bars=2) == {
+        s: bars[s] for s in symbols if s != "ETHUSDT"}
+    assert not list(tmp_path.glob("bars_*.pkl"))
+    assert feed.load_many(symbols, min_bars=2) == bars
+    assert feed.load_many(symbols, min_bars=2) == bars
+    assert calls == symbols + symbols
+
+
 def test_funding_skips_cached_missing_file(monkeypatch):
     """사전 수집기가 404를 빈 바이트로 캐시한다. 적재할 때 ZIP으로 열면 안 된다."""
     monkeypatch.setattr(feed, "_cached", lambda name, fetch: b"")
