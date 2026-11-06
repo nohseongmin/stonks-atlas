@@ -1,5 +1,6 @@
 """수집기 검정. **네트워크를 안 탄다** — 파싱과 캐시 규칙만 본다."""
 import io
+import logging
 import urllib.error
 import zipfile
 
@@ -101,7 +102,7 @@ def test_load_many_cache_tracks_requested_symbols(first, second, tmp_path, monke
 
 
 @pytest.mark.parametrize("symbols", [["ETHUSDT"], ["BTCUSDT", "ETHUSDT"]])
-def test_load_many_retries_failed_load_before_caching(symbols, tmp_path, monkeypatch):
+def test_load_many_retries_failed_load_before_caching(symbols, tmp_path, monkeypatch, caplog):
     """일시 실패로 빠진 심볼이 캐시 때문에 다음 실행에서도 빠지면 안 된다."""
     monkeypatch.setattr(feed, "CACHE", tmp_path)
     bars = {s: feed.Bars(s, [0, 1], [1, 1], [1, 1], [1, 1], [1, 1])
@@ -121,6 +122,8 @@ def test_load_many_retries_failed_load_before_caching(symbols, tmp_path, monkeyp
     assert feed.load_many(symbols, min_bars=2) == bars
     assert feed.load_many(symbols, min_bars=2) == bars
     assert calls == symbols + symbols
+    assert caplog.record_tuples == [
+        ("dump.feed", logging.WARNING, "ETHUSDT 1d: 봉 적재 실패 (TimeoutError)")]
 
 
 def test_funding_skips_cached_missing_file(monkeypatch):
