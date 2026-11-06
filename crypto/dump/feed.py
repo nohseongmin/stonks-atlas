@@ -28,6 +28,7 @@ import csv
 import hashlib
 import io
 import json
+import logging
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -37,6 +38,8 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from .backtest import Bars
+
+logger = logging.getLogger(__name__)
 
 DUMP = "https://data.binance.vision"
 S3 = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision"
@@ -269,8 +272,7 @@ def load_many(symbols: list[str], interval: str = "1d",
               min_bars: int = 60, cache: bool = True) -> dict[str, Bars]:
     """여러 심볼을 `Bars` 로. **`min_bars` 미만은 버린다** — 정렬이 불가능하다.
 
-    버린 심볼 수를 조용히 삼키지 않는다. 호출부가 세어 보고할 수 있게
-    반환값에 안 넣고 끝내지 말고 로그로 남길 것.
+    적재 실패는 심볼과 오류 종류를 로그로 남기고 계속한다.
     """
     import pickle
     # 단일 자산과 횡단면 캐시가 섞이지 않게 요청 목록의 순서까지 구분한다.
@@ -284,7 +286,8 @@ def load_many(symbols: list[str], interval: str = "1d",
     for s in symbols:
         try:
             b = load(s, interval)
-        except Exception:                           # noqa: BLE001
+        except Exception as e:                      # noqa: BLE001
+            logger.warning("%s %s: 봉 적재 실패 (%s)", s, interval, type(e).__name__)
             is_complete = False
             continue
         if len(b) >= min_bars:
