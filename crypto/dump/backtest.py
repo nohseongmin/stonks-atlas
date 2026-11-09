@@ -348,15 +348,19 @@ def run_cross_section(bars: dict[str, Bars], rule, venue: Venue,
                 contrib[s] = contrib.get(s, 0.0) + part * eq
         eq *= 1 + pnl
 
+        settlements = {}
         for s, w in held.items():
             fund = bars[s].funding
             while fpos[s] < len(fund) and fund[fpos[s]][0] <= axis[t + 1]:
                 ftime, rate = fund[fpos[s]]
                 if ftime > axis[t]:
-                    pay = eq * w * rate
-                    funding_cost += pay
-                    eq -= pay
+                    settlements[ftime] = settlements.get(ftime, 0.0) + w * rate
                 fpos[s] += 1
+        # 같은 시각의 펀딩은 정산 전 자본 하나를 기준으로 함께 반영한다.
+        for ftime in sorted(settlements):
+            pay = eq * settlements[ftime]
+            funding_cost += pay
+            eq -= pay
 
         if eq <= 0:
             equity.append(0.0)
