@@ -158,6 +158,33 @@ def test_long_pays_funding_short_receives():
     assert lon.final == pytest.approx(99.0)
 
 
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("short_time, expected", [(0.5, 100.0), (0.75, 99.99)])
+def test_funding_nets_only_simultaneous_settlements(reverse, short_time, expected):
+    """동시 롱·숏 펀딩은 상쇄하고, 다른 시각의 정산은 따로 반영한다."""
+    b = {"A": flat([0, 1, 2], name="A", funding=[(DAY // 2, 0.01)]),
+         "B": flat([0, 1, 2], name="B", funding=[(int(short_time * DAY), 0.01)])}
+    weights = {"A": 1.0, "B": -1.0}
+    if reverse:
+        weights = dict(reversed(list(weights.items())))
+    r = run_cross_section(b, lambda t, p, l: weights if t == 0 else None,
+                          FREE, rebalance=1)
+    assert r.final == pytest.approx(expected)
+    assert r.funding_paid == pytest.approx(100.0 - expected)
+    assert r.liquidated_at is None
+
+
+def test_simultaneous_funding_compounds_between_settlement_times():
+    """같은 봉의 다음 정산은 앞 정산을 반영한 자본으로 계산한다."""
+    f = [(DAY // 4, 0.01), (3 * DAY // 4, 0.01)]
+    b = {s: flat([0, 1, 2], name=s, funding=f) for s in ("A", "B")}
+    r = run_cross_section(b, lambda t, p, l: {"A": 1.0, "B": 0.5},
+                          FREE, rebalance=1)
+    expected = 100.0 * (1 - 0.01 * 1.5) ** 2
+    assert r.final == pytest.approx(expected)
+    assert r.funding_paid == pytest.approx(100.0 - expected)
+
+
 def test_wipeout_stops_the_run():
     px = [100.0, 100.0, 1.0, 1.0]
     b = {"A": Bars("A", [i * DAY for i in range(4)], px, px, px, px)}
