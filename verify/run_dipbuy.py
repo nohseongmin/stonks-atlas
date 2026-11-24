@@ -99,7 +99,7 @@ def main(argv=None) -> int:
             print(f"  · {f}")
     else:
         print("**7 종 전부 통과.** 이 프로젝트 첫 배터리 완주다.")
-    return 0
+    return 1 if fails else 0
 
 
 if __name__ == "__main__":
